@@ -280,8 +280,22 @@ public void showUserHeader() {
         final int MAX_ATTEMPTS = 3;
 
         while (failedAttempts < MAX_ATTEMPTS) {
-            System.out.print(CYAN + "Enter Current Password: " + RESET);
-            String currentPassword = sc.nextLine();
+            System.out.print(CYAN + "Enter Current Password (or type 'cancel' to abort): " + RESET);
+            String currentPassword = sc.nextLine().trim();
+
+            // Check for cancel
+            if (currentPassword.equalsIgnoreCase("cancel")) {
+                System.out.println(YELLOW + "Password change cancelled." + RESET);
+                return;
+            }
+
+            // Check for empty
+            if (currentPassword.isEmpty()) {
+                System.out.println(RED + "Password cannot be empty." + RESET);
+                pause();
+                Group22.clearConsole();
+                continue;
+            }
 
             try (Connection conn = DatabaseConnection.getConnection()) {
                 
@@ -330,15 +344,37 @@ public void showUserHeader() {
                     displayPasswordRequirements();
 
                     System.out.println();
-                    System.out.print(CYAN + "Enter New Password: " + RESET);
-                    String newPassword = sc.nextLine();
+                    System.out.print(CYAN + "Enter New Password (or type 'cancel' to abort): " + RESET);
+                    String newPassword = sc.nextLine().trim();
                     
-                    System.out.print(CYAN + "Confirm New Password: " + RESET);
-                    String confirmPassword = sc.nextLine();
+                    // Check for cancel
+                    if (newPassword.equalsIgnoreCase("cancel")) {
+                        System.out.println(YELLOW + "Password change cancelled." + RESET);
+                        return;
+                    }
+
+                    // Check for empty
+                    if (newPassword.isEmpty()) {
+                        System.out.println(RED + "Password cannot be empty." + RESET);
+                        pause();
+                        continue;
+                    }
+
+                    System.out.println();
+                    System.out.print(CYAN + "Confirm New Password (or type 'cancel' to abort): " + RESET);
+                    String confirmPassword = sc.nextLine().trim();
+
+                    // Check for cancel
+                    if (confirmPassword.equalsIgnoreCase("cancel")) {
+                        System.out.println(YELLOW + "Password change cancelled." + RESET);
+                        return;
+                    }
 
                     // Check if passwords match
                     if (!newPassword.equals(confirmPassword)) {
-                        System.out.println(RED + "Password confirmation does not match." + RESET);
+                        System.out.println();
+                        System.out.println(RED + "❌ Password confirmation does not match." + RESET);
+                        System.out.println(CYAN + "Please try again..." + RESET);
                         pause();
                         continue;
                     }
@@ -346,7 +382,8 @@ public void showUserHeader() {
                     // Validate new password
                     String validationError = validatePassword(newPassword);
                     if (validationError != null) {
-                        System.out.println(RED + validationError + RESET);
+                        System.out.println();
+                        System.out.println(RED + "❌ " + validationError + RESET);
                         pause();
                         continue;
                     }
@@ -358,6 +395,7 @@ public void showUserHeader() {
                     updateStmt.setInt(2, userId);
                     updateStmt.executeUpdate();
 
+                    System.out.println();
                     System.out.println(GREEN + "✅ Password updated successfully." + RESET);
                     pause();
                     passwordChanged = true;
@@ -366,6 +404,7 @@ public void showUserHeader() {
                 return; // Exit method after successful change
 
             } catch (Exception e) {
+                System.out.println();
                 System.out.println(RED + "Password update failed: " + e.getMessage() + RESET);
                 pause();
                 return;
@@ -638,7 +677,10 @@ public void showUserHeader() {
     /**
      * Handles sorting the current list.
      */
-    private void handleSortContacts() {
+    /**
+     * Handles sorting the current list.
+     */
+ private void handleSortContacts() {
         if (!hasEverShownList || visibleList.isEmpty()) {
             System.out.println(RED + "Cannot sort empty list." + RESET);
             pause();
@@ -646,38 +688,69 @@ public void showUserHeader() {
         }
 
         if (confirmYesNo("sort the CURRENT visible list")) {
-            clearScreen();
-            printVisibleListPaginated();
-            System.out.println();
             
-            System.out.println(CYAN + "Sorting list..." + RESET);
-            
-            int field = askSortField();
-            String fieldName = (field == 1) ? "First Name" : "Last Name";
-            
-            clearScreen();
-            printVisibleListPaginated();
-            System.out.println();
-            
-            System.out.println(CYAN + "Sorting by " + fieldName + "..." + RESET);
-            
-            int order = askSortOrder();
-            String orderName = (order == 1) ? "ASC" : "DESC";
-            
-            // Sort using Contact getters (encapsulation)
-            visibleList.sort((a, b) -> {
-                int cmp = (field == 1) 
-                    ? a.getFirstName().compareToIgnoreCase(b.getFirstName())
-                    : a.getLastName().compareToIgnoreCase(b.getLastName());
-                return (order == 1) ? cmp : -cmp;
-            });
-            
-            currentListTitle = CYAN + "List of Contacts sorted by " + fieldName + 
-                             " in " + orderName + " order" + RESET;
-            currentPage = 0;
+            // OUTER LOOP - Field selection with retry
+            while (true) {
+                clearScreen();
+                printVisibleListPaginated();
+                System.out.println();
+                
+                System.out.println(CYAN + "Sorting list..." + RESET);
+                
+                int field = askSortField();
+                
+                // Check for cancel - return to contacts menu
+                if (field == 0) {
+                    System.out.println(YELLOW + "Sort cancelled." + RESET);
+                    pause();
+                    return;  // Exit to contacts menu
+                }
+                
+                String fieldName = (field == 1) ? "First Name" : "Last Name";
+                
+                // INNER LOOP - Order selection with retry
+                while (true) {
+                    clearScreen();
+                    printVisibleListPaginated();
+                    System.out.println();
+                    
+                    System.out.println(CYAN + "Sorting by " + fieldName + "..." + RESET);
+                    
+                    int order = askSortOrder();
+                    
+                    // Check for cancel - return to FIELD selection
+                    if (order == 0) {
+                        System.out.println(YELLOW + "Sort order cancelled. Returning to field selection..." + RESET);
+                        pause();
+                        break;  // Break inner loop, go back to field selection
+                    }
+                    
+                    String orderName = (order == 1) ? "ASC" : "DESC";
+                    
+                    // Perform sort
+                    visibleList.sort((a, b) -> {
+                        int cmp = (field == 1) 
+                            ? a.getFirstName().compareToIgnoreCase(b.getFirstName())
+                            : a.getLastName().compareToIgnoreCase(b.getLastName());
+                        return (order == 1) ? cmp : -cmp;
+                    });
+                    
+                    currentListTitle = CYAN + "List of Contacts sorted by " + fieldName + 
+                                     " in " + orderName + " order" + RESET;
+                    currentPage = 0;
+                    
+                    System.out.println();
+                    System.out.println(GREEN + "✅ List sorted successfully!" + RESET);
+                    pause();
+                    
+                    return;  // Exit completely after successful sort
+                }
+                
+                // If we're here, user cancelled order selection
+                // Loop continues to field selection
+            }
         }
     }
-
     // ==========================================
     // PAGINATION NAVIGATION
     // ==========================================
@@ -811,64 +884,72 @@ public void showUserHeader() {
      * 
      * <p>Special value "null0" searches for empty/null fields.</p>
      */
-    private void handleSingleFieldSearch() {
-        if (!hasEverShownList || visibleList.isEmpty() || 
-            confirmYesNo("replace the CURRENT visible list with search results")) {
-            
-            clearScreen();
-            
-            if (!visibleList.isEmpty()) {
-                printVisibleListPaginated();
-                System.out.println();
+   private void handleSingleFieldSearch() {
+    if (!hasEverShownList || visibleList.isEmpty() || 
+        confirmYesNo("replace the CURRENT visible list with search results")) {
+        
+        clearScreen();
+        
+        if (!visibleList.isEmpty()) {
+            printVisibleListPaginated();
+            System.out.println();
+        }
+
+        System.out.println(CYAN + "Searching for contacts..." + RESET);
+
+        // Field selection loop
+        while (true) {
+            System.out.println(GREEN + "[1] - First Name" + RESET);
+            System.out.println(GREEN + "[2] - Middle Name" + RESET);
+            System.out.println(GREEN + "[3] - Last Name" + RESET);
+            System.out.println(GREEN + "[4] - Nickname" + RESET);
+            System.out.println(GREEN + "[5] - City" + RESET);
+            System.out.println(GREEN + "[6] - Phone" + RESET);
+            System.out.println(GREEN + "[7] - Birth Year (YYYY)" + RESET);
+            System.out.println(GREEN + "[8] - Birth Month (1-12)" + RESET);
+            System.out.println(GREEN + "[9] - LinkedIn (y/n)" + RESET);
+            System.out.println(RED + "[0] - Cancel" + RESET);  // ← YENİ!
+            System.out.print(CYAN + "Pick (0-9): " + RESET);  // ← 0-9 oldu
+
+            String fieldChoice = sc.nextLine().trim();
+
+            // Cancel check
+            if (fieldChoice.equals("0")) {
+                System.out.println(YELLOW + "Search cancelled." + RESET);
+                pause();
+                return;
             }
 
-            System.out.println(CYAN + "Searching for contacts..." + RESET);
-
-            // Field selection loop
-            while (true) {
-                System.out.println(GREEN + "[1] - First Name" + RESET);
-                System.out.println(GREEN + "[2] - Middle Name" + RESET);
-                System.out.println(GREEN + "[3] - Last Name" + RESET);
-                System.out.println(GREEN + "[4] - Nickname" + RESET);
-                System.out.println(GREEN + "[5] - City" + RESET);
-                System.out.println(GREEN + "[6] - Phone" + RESET);
-                System.out.println(GREEN + "[7] - Birth Year (YYYY)" + RESET);
-                System.out.println(GREEN + "[8] - Birth Month (1-12)" + RESET);
-                System.out.println(GREEN + "[9] - LinkedIn (y/n)" + RESET);
-                System.out.print(CYAN + "Pick (1-9): " + RESET);
-
-                String fieldChoice = sc.nextLine().trim();
-
-                if (!fieldChoice.matches("[1-9]")) {
-                    System.out.println(RED + "Invalid input. Enter a number from 1 to 9." + RESET);
-                    continue;
-                }
-
-                int fieldNum = Integer.parseInt(fieldChoice);
-
-                // Get search value with validation
-                String searchValue = getSearchValueForField(fieldNum);
-                if (searchValue == null) {
-                    continue; // Invalid input, retry
-                }
-
-                // Map field number to database column
-                String columnName = mapFieldNumberToColumn(fieldNum);
-                String displayName = getFieldDisplayName(fieldNum);
-
-                // Process special cases for search value
-                String processedValue = processSearchValue(fieldNum, searchValue);
-
-                // Perform search
-                visibleList = searchContacts(columnName, processedValue);
-                currentListTitle = CYAN + "List of Search Results (" + displayName + ")" + RESET;
-                currentPage = 0;
-                hasEverShownList = true;
-                
-                break; // Exit field selection loop
+            if (!fieldChoice.matches("[1-9]")) {
+                System.out.println(RED + "Invalid input. Enter a number from 0 to 9." + RESET);
+                continue;
             }
+
+            int fieldNum = Integer.parseInt(fieldChoice);
+
+            // Get search value with validation
+            String searchValue = getSearchValueForField(fieldNum);
+            if (searchValue == null) {
+                continue; // Invalid input, retry
+            }
+
+            // Map field number to database column
+            String columnName = mapFieldNumberToColumn(fieldNum);
+            String displayName = getFieldDisplayName(fieldNum);
+
+            // Process special cases for search value
+            String processedValue = processSearchValue(fieldNum, searchValue);
+
+            // Perform search
+            visibleList = searchContacts(columnName, processedValue);
+            currentListTitle = CYAN + "List of Search Results (" + displayName + ")" + RESET;
+            currentPage = 0;
+            hasEverShownList = true;
+            
+            break; // Exit field selection loop
         }
     }
+}
 
     /**
      * Gets and validates search value for a specific field.
@@ -893,9 +974,15 @@ public void showUserHeader() {
                 System.out.println(BLUE + "Guide: " + guide + RESET);
             }
 
-            System.out.print(CYAN + "Enter value (or null0 for empty): " + RESET);
+            System.out.print(CYAN + "Enter value (null0=empty, 0=cancel): " + RESET);
             String value = sc.nextLine().trim();
 
+// Check for cancel
+            if (value.equals("0")) {
+                System.out.println(YELLOW + "Search cancelled." + RESET);
+                pause();
+                return null;
+            }
             // Check if empty
             if (isBlank(value)) {
                 Group22.clearConsole();
@@ -1180,20 +1267,29 @@ public void showUserHeader() {
         }
 
         System.out.println(CYAN + "Multi-Field Search" + RESET);
-        System.out.println(CYAN + "Select how many fields (2 to 4)" + RESET);
+        System.out.println(CYAN + "Select how many fields (2 to 4, or 0 to cancel)" + RESET);
         System.out.print(CYAN + "Enter number of fields: " + RESET);
+
+        String input = sc.nextLine().trim();
+
+// Check for cancel
+        if (input.equals("0")) {
+        System.out.println(YELLOW + "Search cancelled." + RESET);
+        pause();
+        return;
+        }
 
         int numFields;
         try {
-            numFields = Integer.parseInt(sc.nextLine().trim());
-            if (numFields < 2 || numFields > 4) {
-                throw new Exception();
-            }
-        } catch (Exception e) {
-            System.out.println(RED + "You must select between 2 and 4 fields." + RESET);
-            pause();
-            return;
-        }
+    numFields = Integer.parseInt(input);
+    if (numFields < 2 || numFields > 4) {
+        throw new Exception();
+    }
+} catch (Exception e) {
+    System.out.println(RED + "You must select between 2 and 4 fields." + RESET);
+    pause();
+    return;
+}
 
         String[] selectedFields = new String[numFields];
         String[] searchValues = new String[numFields];
@@ -1241,24 +1337,33 @@ public void showUserHeader() {
 
             System.out.println(CYAN + "Choose field #" + fieldNumber + RESET);
 
-            // Display all available fields
-            for (int i = 0; i < MULTI_FIELDS.length; i++) {
-                System.out.println(GREEN + "[" + (i + 1) + "] - " + MULTI_FIELDS[i][1] + RESET);
-            }
+// Display all available fields
+for (int i = 0; i < MULTI_FIELDS.length; i++) {
+    System.out.println(GREEN + "[" + (i + 1) + "] - " + MULTI_FIELDS[i][1] + RESET);
+}
+System.out.println(RED + "[0] - Cancel" + RESET);  // ← YENİ!
 
-            System.out.print(CYAN + "Pick field: " + RESET);
-
+System.out.print(CYAN + "Pick field (0 to cancel): " + RESET);  // ← Güncellendi
             int choice;
-            try {
-                choice = Integer.parseInt(sc.nextLine().trim()) - 1;
-                if (choice < 0 || choice >= MULTI_FIELDS.length) {
-                    throw new Exception();
-                }
-            } catch (Exception e) {
-                System.out.println(RED + "Invalid field selection." + RESET);
-                pause();
-                continue;
-            }
+try {
+    choice = Integer.parseInt(sc.nextLine().trim());
+    
+    // Cancel check
+    if (choice == 0) {
+        System.out.println(YELLOW + "Search cancelled." + RESET);
+        pause();
+        return null;
+    }
+    
+    choice--; // Convert to 0-based index
+    if (choice < 0 || choice >= MULTI_FIELDS.length) {
+        throw new Exception();
+    }
+} catch (Exception e) {
+    System.out.println(RED + "Invalid field selection." + RESET);
+    pause();
+    continue;
+}
 
             String selectedField = MULTI_FIELDS[choice][0];
 
@@ -1302,8 +1407,16 @@ public void showUserHeader() {
             // Show field-specific guide
             displayMultiFieldGuide(fieldName);
 
-            System.out.print(CYAN + "Enter value (or null0 for empty): " + RESET);
+            System.out.print(CYAN + "Enter value (0=cancel, null0=empty): " + RESET);  // ← DEĞİŞTİ
             String value = sc.nextLine().trim();
+
+            // Check for cancel - YENİ BLOK BAŞLANGIÇ
+            if (value.equals("0") || value.equalsIgnoreCase("cancel")) {
+                System.out.println(YELLOW + "Search cancelled." + RESET);
+                pause();
+                return null;
+            }
+            // YENİ BLOK BİTİŞ
 
             if (isBlank(value)) {
                 Group22.clearConsole();
@@ -1529,41 +1642,51 @@ public void showUserHeader() {
     /**
      * Asks user which field to sort by.
      * 
-     * @return 1 for First Name, 2 for Last Name
+     * @return 1 for First Name, 2 for Last Name, 0 for Cancel
      */
     protected int askSortField() {
         while (true) {
             System.out.println(GREEN + "[1] - First Name" + RESET);
             System.out.println(GREEN + "[2] - Last Name" + RESET);
-            System.out.print("\n" + CYAN + "Pick an Option (1-2): " + RESET);
+            System.out.println(RED + "[0] - Cancel" + RESET);  // ← YENİ!
+            System.out.print("\n" + CYAN + "Pick an Option (0-2): " + RESET);  // ← 0-2 oldu
             
             String choice = sc.nextLine().trim();
+            
+            if (choice.equals("0")) {  // ← YENİ!
+                return 0;  // Cancel
+            }
             
             if (choice.matches("[1-2]")) {
                 return Integer.parseInt(choice);
             }
             
-            System.out.println(RED + "Invalid input. Enter (1-2)." + RESET);
+            System.out.println(RED + "Invalid input. Enter (0-2)." + RESET);
         }
     }
 
     /**
      * Asks user for sort order (ascending or descending).
      * 
-     * @return 1 for ascending, 2 for descending
+     * @return 1 for ascending, 2 for descending, 0 for Cancel
      */
     protected int askSortOrder() {
         while (true) {
             System.out.println(GREEN + "1 - ASC | 2 - DESC" + RESET);
-            System.out.print("\n" + CYAN + "Pick an Option (1-2): " + RESET);
+            System.out.println(RED + "0 - Cancel" + RESET);  // ← YENİ!
+            System.out.print("\n" + CYAN + "Pick an Option (0-2): " + RESET);  // ← 0-2 oldu
             
             String choice = sc.nextLine().trim();
+            
+            if (choice.equals("0")) {  // ← YENİ!
+                return 0;  // Cancel
+            }
             
             if (choice.matches("[1-2]")) {
                 return Integer.parseInt(choice);
             }
             
-            System.out.println(RED + "Invalid input. Enter (1-2)." + RESET);
+            System.out.println(RED + "Invalid input. Enter (0-2)." + RESET);
         }
     }
 
