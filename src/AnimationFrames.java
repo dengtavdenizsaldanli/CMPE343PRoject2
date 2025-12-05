@@ -26,6 +26,7 @@ public class AnimationFrames {
     // ==========================================
     // PRIVATE CONSTRUCTOR (Utility Class)
     // ==========================================
+    
     private AnimationFrames() {
         throw new AssertionError("AnimationFrames is a utility class and should not be instantiated");
     }
@@ -117,8 +118,8 @@ public class AnimationFrames {
         String p1 = CYAN +
         "   _  _  ____  __    ___  __  __  __  ____    ____  __  \n" +
         "  ( \\/ )(  __)(  )  / __)/  \\(  \\/  )(  __)  (_  _)/  \\ \n" +
-        "  / \\/ \\ ) _) / (_/\\( (__(  O ))    (  ) _)     )( (  O )\n" +
-        "  \\_)(_/(____)\\____/\\___)\\__/(_/\\/\\_)(____)    (__) \\__/ " + RESET;
+        "  / \\/ \\ ) _) / (_/\\( (__(  O ))    (  ) _)    )( (  O )\n" +
+        "  \\_)(_/(____)\\____/\\___)\\__/(_/\\/\\_)(____)   (__) \\__/ " + RESET;
 
         // PART 2: ROLE-BASED (Yellow)
         String p2 = YELLOW +
@@ -129,17 +130,17 @@ public class AnimationFrames {
 
         // PART 3: CONTACT (Green)
         String p3 = GREEN +
-        "    ___  __  _  _  ____  __    ___  ____ \n" +
-        "   / __)/  \\( \\( )(_  _)/ _\\  / __)(_  _)\n" +
-        "  ( (__(  O ))  (   )( /    \\( (__   )(  \n" +
-        "   \\___)\\__/(_)\\_) (__)\\_/\\_/ \\___) (__)" + RESET;
+        "   ___  __  _  _  ____  __    ___  ____ \n" +
+        "  / __)/  \\( \\( )(_  _)/ _\\  / __)(_  _)\n" +
+        " ( (__(  O ))  (   )( /    \\( (__   )(  \n" +
+        "  \\___)\\__/(_)\\_) (__)\\_/\\_/ \\___) (__)" + RESET;
 
         // PART 4: MANAGEMENT (Blue)
         String p4 = BLUE +
         "   __  __  __    _  _  __    ___  ____  __  __  ____  _  _  ____ \n" +
         "  (  \\/  )/ _\\  ( \\( )/ _\\  / __)(  __)(  \\/  )(  __)( \\( )(_  _)\n" +
         "   )    (/    \\  )  (/    \\( (_ \\ ) _)  )    (  ) _)  )  (   )(  \n" +
-        "  (_/\\/\\_)\\_/\\_)(_)\\_)\\_/\\_/ \\___/(____)(_/\\/\\_)(____)(_)\\_) (__) " + RESET;
+        "  (_/\\/\\_)\\_/\\_)(_)\\_)\\_/\\_/\\___/(____)(_/\\/\\_)(____)(_)\\_)(__) " + RESET;
 
         // PART 5: SYSTEM (Purple)
         String p5 = PURPLE +
@@ -191,5 +192,4 @@ public class AnimationFrames {
             CYAN + "Good Bye! See you soon." + RESET
         };
     }
-
 }
