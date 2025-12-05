@@ -108,7 +108,6 @@ public class LoginMenu {
             if (rs.next()) {
                 String storedHash = rs.getString("password_hash");
                 String enteredHash = hashPassword(password);
-,
                 if (storedHash.equalsIgnoreCase(enteredHash)) {
 
                     int id = rs.getInt("user_id");
@@ -262,3 +261,4 @@ public class LoginMenu {
         }
     }
 }
+
