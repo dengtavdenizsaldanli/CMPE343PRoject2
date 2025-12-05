@@ -643,33 +643,61 @@ public void showUserHeader() {
     /**
      * Handles search menu (single or multi-field).
      */
+    /**
+     * Handles search menu (single or multi-field).
+     */
     private void handleSearchContacts() {
-        clearScreen();
+        boolean searchMenuRunning = true;
         
-        if (!visibleList.isEmpty()) {
-            printVisibleListPaginated();
+        while (searchMenuRunning) {
+            clearScreen();
+            
+            if (!visibleList.isEmpty()) {
+                printVisibleListPaginated();
+                System.out.println();
+            }
+
+            System.out.println(CYAN + "╔════════════════════════════════════════════════╗" + RESET);
+            System.out.println(CYAN + "║            SEARCH CONTACTS MENU                ║" + RESET);
+            System.out.println(CYAN + "╚════════════════════════════════════════════════╝" + RESET);
             System.out.println();
-        }
+            System.out.println(GREEN + "[1] - Single Field Search" + RESET);
+            System.out.println(GREEN + "[2] - Multiple Field Search" + RESET);
+            System.out.println(RED + "[3] - Back to Contacts Menu" + RESET);
+            System.out.print("\n" + CYAN + "Pick (1-3): " + RESET);
 
-        System.out.println(CYAN + "Search Contacts" + RESET);
-        System.out.println(GREEN + "[1] - Single Field Search" + RESET);
-        System.out.println(GREEN + "[2] - Multiple Field Search" + RESET);
-        System.out.println(RED + "[3] - Back" + RESET);
-        System.out.print(CYAN + "Pick (1-3): " + RESET);
+            String searchChoice = sc.nextLine().trim();
 
-        String searchChoice = sc.nextLine().trim();
-
-        switch (searchChoice) {
-            case "1" -> handleSingleFieldSearch();
-            case "2" -> handleMultiFieldSearch();
-            case "3" -> { /* Back to menu */ }
-            default -> {
-                System.out.println(RED + "Invalid input." + RESET);
-                pause();
+            switch (searchChoice) {
+                case "1" -> {
+                    boolean singleSearchResult = handleSingleFieldSearch();
+                    // If search was completed successfully, exit to contacts menu
+                    if (singleSearchResult) {
+                        searchMenuRunning = false;
+                    }
+                    // If search was cancelled (returns false), stay in search menu
+                }
+                
+                case "2" -> {
+                    boolean multiSearchResult = handleMultiFieldSearch();
+                    // If search was completed successfully, exit to contacts menu
+                    if (multiSearchResult) {
+                        searchMenuRunning = false;
+                    }
+                    // If search was cancelled (returns false), stay in search menu
+                }
+                
+                case "3" -> {
+                    searchMenuRunning = false; // Back to contacts menu
+                }
+                
+                default -> {
+                    System.out.println(RED + "Invalid input. Enter 1, 2, or 3." + RESET);
+                    pause();
+                }
             }
         }
     }
-
     // ==========================================
     // CONTACTS MENU - OPTION 3: SORT
     // ==========================================
@@ -884,72 +912,81 @@ public void showUserHeader() {
      * 
      * <p>Special value "null0" searches for empty/null fields.</p>
      */
-   private void handleSingleFieldSearch() {
-    if (!hasEverShownList || visibleList.isEmpty() || 
-        confirmYesNo("replace the CURRENT visible list with search results")) {
-        
-        clearScreen();
-        
-        if (!visibleList.isEmpty()) {
-            printVisibleListPaginated();
-            System.out.println();
-        }
-
-        System.out.println(CYAN + "Searching for contacts..." + RESET);
-
-        // Field selection loop
-        while (true) {
-            System.out.println(GREEN + "[1] - First Name" + RESET);
-            System.out.println(GREEN + "[2] - Middle Name" + RESET);
-            System.out.println(GREEN + "[3] - Last Name" + RESET);
-            System.out.println(GREEN + "[4] - Nickname" + RESET);
-            System.out.println(GREEN + "[5] - City" + RESET);
-            System.out.println(GREEN + "[6] - Phone" + RESET);
-            System.out.println(GREEN + "[7] - Birth Year (YYYY)" + RESET);
-            System.out.println(GREEN + "[8] - Birth Month (1-12)" + RESET);
-            System.out.println(GREEN + "[9] - LinkedIn (y/n)" + RESET);
-            System.out.println(RED + "[0] - Cancel" + RESET);  // ← YENİ!
-            System.out.print(CYAN + "Pick (0-9): " + RESET);  // ← 0-9 oldu
-
-            String fieldChoice = sc.nextLine().trim();
-
-            // Cancel check
-            if (fieldChoice.equals("0")) {
-                System.out.println(YELLOW + "Search cancelled." + RESET);
-                pause();
-                return;
-            }
-
-            if (!fieldChoice.matches("[1-9]")) {
-                System.out.println(RED + "Invalid input. Enter a number from 0 to 9." + RESET);
-                continue;
-            }
-
-            int fieldNum = Integer.parseInt(fieldChoice);
-
-            // Get search value with validation
-            String searchValue = getSearchValueForField(fieldNum);
-            if (searchValue == null) {
-                continue; // Invalid input, retry
-            }
-
-            // Map field number to database column
-            String columnName = mapFieldNumberToColumn(fieldNum);
-            String displayName = getFieldDisplayName(fieldNum);
-
-            // Process special cases for search value
-            String processedValue = processSearchValue(fieldNum, searchValue);
-
-            // Perform search
-            visibleList = searchContacts(columnName, processedValue);
-            currentListTitle = CYAN + "List of Search Results (" + displayName + ")" + RESET;
-            currentPage = 0;
-            hasEverShownList = true;
+   /**
+     * Handles single field search.
+     * 
+     * @return true if search completed, false if cancelled
+     */
+    private boolean handleSingleFieldSearch() {
+        if (!hasEverShownList || visibleList.isEmpty() || 
+            confirmYesNo("replace the CURRENT visible list with search results")) {
             
-            break; // Exit field selection loop
+            clearScreen();
+            
+            if (!visibleList.isEmpty()) {
+                printVisibleListPaginated();
+                System.out.println();
+            }
+
+            System.out.println(CYAN + "Single Field Search" + RESET);
+            System.out.println();
+
+            // Field selection loop
+            while (true) {
+                System.out.println(GREEN + "[1] - First Name" + RESET);
+                System.out.println(GREEN + "[2] - Middle Name" + RESET);
+                System.out.println(GREEN + "[3] - Last Name" + RESET);
+                System.out.println(GREEN + "[4] - Nickname" + RESET);
+                System.out.println(GREEN + "[5] - City" + RESET);
+                System.out.println(GREEN + "[6] - Phone" + RESET);
+                System.out.println(GREEN + "[7] - Birth Year (YYYY)" + RESET);
+                System.out.println(GREEN + "[8] - Birth Month (1-12)" + RESET);
+                System.out.println(GREEN + "[9] - LinkedIn (y/n)" + RESET);
+                System.out.println(RED + "[0] - Back to Search Menu" + RESET);  // ← DEĞİŞTİ
+                System.out.print("\n" + CYAN + "Pick (0-9): " + RESET);
+
+                String fieldChoice = sc.nextLine().trim();
+
+                // Cancel check
+                if (fieldChoice.equals("0")) {
+                    System.out.println(YELLOW + "Search cancelled. Returning to search menu..." + RESET);
+                    pause();
+                    return false;  // ← FALSE DÖNDÜR (cancelled)
+                }
+
+                if (!fieldChoice.matches("[1-9]")) {
+                    System.out.println(RED + "Invalid input. Enter a number from 0 to 9." + RESET);
+                    continue;
+                }
+
+                int fieldNum = Integer.parseInt(fieldChoice);
+
+                // Get search value with validation
+                String searchValue = getSearchValueForField(fieldNum);
+                if (searchValue == null) {
+                    // User cancelled during value entry, return to search menu
+                    return false;  // ← FALSE DÖNDÜR (cancelled)
+                }
+
+                // Map field number to database column
+                String columnName = mapFieldNumberToColumn(fieldNum);
+                String displayName = getFieldDisplayName(fieldNum);
+
+                // Process special cases for search value
+                String processedValue = processSearchValue(fieldNum, searchValue);
+
+                // Perform search
+                visibleList = searchContacts(columnName, processedValue);
+                currentListTitle = CYAN + "List of Search Results (" + displayName + ")" + RESET;
+                currentPage = 0;
+                hasEverShownList = true;
+                
+                return true;  // ← TRUE DÖNDÜR (completed)
+            }
         }
+        
+        return false;  // User said no to confirmYesNo
     }
-}
 
     /**
      * Gets and validates search value for a specific field.
@@ -1258,7 +1295,7 @@ public void showUserHeader() {
      *   <li>"y"/"n" for LinkedIn - Has/doesn't have LinkedIn</li>
      * </ul>
      */
-    private void handleMultiFieldSearch() {
+    private boolean handleMultiFieldSearch() {
         clearScreen();
         
         if (!visibleList.isEmpty()) {
@@ -1272,24 +1309,24 @@ public void showUserHeader() {
 
         String input = sc.nextLine().trim();
 
-// Check for cancel
+        // Check for cancel
         if (input.equals("0")) {
-        System.out.println(YELLOW + "Search cancelled." + RESET);
-        pause();
-        return;
+            System.out.println(YELLOW + "Search cancelled. Returning to search menu..." + RESET);
+            pause();
+            return false;  // ← FALSE DÖNDÜR (cancelled)
         }
 
         int numFields;
         try {
-    numFields = Integer.parseInt(input);
-    if (numFields < 2 || numFields > 4) {
-        throw new Exception();
-    }
-} catch (Exception e) {
-    System.out.println(RED + "You must select between 2 and 4 fields." + RESET);
-    pause();
-    return;
-}
+            numFields = Integer.parseInt(input);
+            if (numFields < 2 || numFields > 4) {
+                throw new Exception();
+            }
+        } catch (Exception e) {
+            System.out.println(RED + "You must select between 2 and 4 fields." + RESET);
+            pause();
+            return false;  // ← FALSE DÖNDÜR (invalid)
+        }
 
         String[] selectedFields = new String[numFields];
         String[] searchValues = new String[numFields];
@@ -1299,14 +1336,14 @@ public void showUserHeader() {
             // Field selection
             String field = selectMultiFieldOption(i + 1, selectedFields, i);
             if (field == null) {
-                return; // User error or cancelled
+                return false; // ← FALSE DÖNDÜR (cancelled)
             }
             selectedFields[i] = field;
 
             // Value input
             String value = getMultiFieldValue(field);
             if (value == null) {
-                return; // User error or cancelled
+                return false; // ← FALSE DÖNDÜR (cancelled)
             }
             searchValues[i] = value;
         }
@@ -1316,6 +1353,8 @@ public void showUserHeader() {
         currentListTitle = CYAN + "Multi-Field Search Results" + RESET;
         currentPage = 0;
         hasEverShownList = true;
+        
+        return true;  // ← TRUE DÖNDÜR (completed)
     }
 
     /**
