@@ -414,25 +414,32 @@ public class SeniorDeveloper extends JuniorDeveloper {
         }
     }
 
+    /**
+     * Gets optional input with validation.
+     * 
+     * @return input string if valid, empty string if skipped, null if cancelled
+     */
     private String getOptionalInput(String fieldName, java.util.function.Predicate<String> validator) {
-        System.out.println(BLUE + fieldName + " (Optional - press ENTER to skip, 0 to cancel):" + RESET);
-        System.out.print("  Value: ");
-        String value = sc.nextLine().trim();
+        while (true) {  // ← DÖNGÜ EKLENDİ!
+            System.out.println(BLUE + fieldName + " (Optional - press ENTER to skip, 0 to cancel):" + RESET);
+            System.out.print("  Value: ");
+            String value = sc.nextLine().trim();
 
-        // Check for cancel
-        if (value.equals("0") || value.equalsIgnoreCase("cancel")) {
-            return null;  // Signal cancellation
-        }
+            // Check for cancel
+            if (value.equals("0") || value.equalsIgnoreCase("cancel")) {
+                return null;  // Signal cancellation
+            }
 
-        if (value.isEmpty()) {
-            return "";  // Return empty string for optional skip
-        }
+            if (value.isEmpty()) {
+                return "";  // Return empty string for optional skip
+            }
 
-        if (validator.test(value)) {
-            return value;
-        } else {
-            System.out.println(RED + "Invalid format! Skipping..." + RESET);
-            return "";
+            if (validator.test(value)) {
+                return value;  // Valid input
+            } else {
+                System.out.println(RED + "Invalid format! Please try again." + RESET);  
+                // Döngü devam eder, tekrar sor
+            }
         }
     }
 
@@ -993,3 +1000,4 @@ public class SeniorDeveloper extends JuniorDeveloper {
     }
 
 }  
+
