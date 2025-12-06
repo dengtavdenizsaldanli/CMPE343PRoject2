@@ -6,61 +6,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-/**
- * Abstract base class for all user roles in the Contact Management System.
- * <p>
- * This class provides common functionality for all roles including:
- * contact viewing, searching, sorting, password management, and logout.
- * Specific roles (Tester, Junior Developer, Senior Developer, Manager)
- * extend this class and add their own permissions.
- * </p>
- * 
- * <p><b>Shared Functionality:</b></p>
- * <ul>
- *   <li>Contact list viewing with pagination (10 items per page)</li>
- *   <li>Single field search (9 search options)</li>
- *   <li>Multi-field search (2-4 fields)</li>
- *   <li>Sort by first name or last name (ascending/descending)</li>
- *   <li>Password change with role-specific requirements</li>
- *   <li>Logout functionality</li>
- * </ul>
- * 
- * <p><b>Turkish Character Support:</b></p>
- * <p>All validation methods support Turkish characters (Ç, Ğ, İ, Ö, Ş, Ü)</p>
- * 
- * @author Group 22
- * @version 1.0
- * @since 2024
- */
 public abstract class Role {
 
     // ==========================================
     // PAGINATION FIELDS
     // ==========================================
     
-    /**
-     * Currently displayed contact list (filtered/sorted).
-     */
     private List<Contact> visibleList = new ArrayList<>();
     
-    /**
-     * Title of the current list (e.g., "All Contacts", "Search Results").
-     */
     private String currentListTitle = "";
     
-    /**
-     * Whether any list has been shown in this session.
-     */
     private boolean hasEverShownList = false;
     
-    /**
-     * Current page number (0-indexed).
-     */
     private int currentPage = 0;
     
-    /**
-     * Number of contacts per page.
-     */
     private final int PAGE_SIZE = 10;
 
     // ==========================================
@@ -113,10 +72,6 @@ public abstract class Role {
     // MULTI-FIELD SEARCH CONFIGURATION
     // ==========================================
     
-    /**
-     * Available fields for multi-field search.
-     * Each entry: [database_column, Display_Name]
-     */
     protected static final String[][] MULTI_FIELDS = new String[][]{
         {"first_name", "First Name"},
         {"middle_name", "Middle Name"},
@@ -144,18 +99,6 @@ public abstract class Role {
     // CONSTRUCTOR
     // ==========================================
     
-    /**
-     * Constructs a Role with user credentials.
-     * <p>
-     * Initializes the scanner and sets up user identity.
-     * </p>
-     * 
-     * @param userId user's database ID
-     * @param username user's login username
-     * @param name user's first name
-     * @param surname user's last name
-     * @param role user's role name
-     */
     public Role(int userId, String username, String name, String surname, String role) {
         this.sc = Group22.getScanner(); // Use shared scanner
         this.lastSearchHadNoResults = false;
@@ -171,50 +114,26 @@ public abstract class Role {
     // GETTERS
     // ==========================================
     
-    /**
-     * Gets user ID.
-     * @return user database ID
-     */
     public int getUserId() {
         return userId;
     }
 
-    /**
-     * Gets username.
-     * @return username
-     */
     public String getUsername() {
         return username;
     }
 
-    /**
-     * Gets first name.
-     * @return first name
-     */
     public String getName() {
         return name;
     }
 
-    /**
-     * Gets surname.
-     * @return surname
-     */
     public String getSurname() {
         return surname;
     }
 
-    /**
-     * Gets role name.
-     * @return role name
-     */
     public String getRole() {
         return role;
     }
 
-    /**
-     * Gets full name.
-     * @return first name + surname
-     */
     public String getFullName() {
         return name + " " + surname;
     }
@@ -222,9 +141,6 @@ public abstract class Role {
     // USER HEADER DISPLAY
     // ==========================================
     
-    /**
- * Displays welcome header with user's name and role.
- */
 public void showUserHeader() {
     System.out.println(CYAN + "╔════════════════════════════════════════════════╗" + RESET);
     
@@ -254,27 +170,6 @@ public void showUserHeader() {
     // PASSWORD CHANGE FUNCTIONALITY
     // ==========================================
     
-    /**
-     * Handles password change process.
-     * <p>
-     * Process:
-     * <ol>
-     *   <li>Verify current password (max 3 attempts)</li>
-     *   <li>Show password requirements (role-specific)</li>
-     *   <li>Get new password with confirmation</li>
-     *   <li>Validate new password</li>
-     *   <li>Update in database</li>
-     * </ol>
-     * </p>
-     * 
-     * <p><b>Password Requirements:</b></p>
-     * <ul>
-     *   <li><b>Manager:</b> 2-16 chars, at least 1 letter, symbols optional</li>
-     *   <li><b>Others:</b> 8-16 chars, 1 letter, 1 number, 1 symbol, cannot match username</li>
-     * </ul>
-     * 
-     * <p>If current password is wrong 3 times, user is logged out.</p>
-     */
     public void changePassword() {
         int failedAttempts = 0;
         final int MAX_ATTEMPTS = 3;
@@ -412,9 +307,6 @@ public void showUserHeader() {
         }
     }
 
-    /**
-     * Displays password requirements based on user's role.
-     */
     private void displayPasswordRequirements() {
         if (role.equals("Manager")) {
             System.out.println(CYAN + "Password Requirements (Manager):" + RESET);
@@ -436,12 +328,6 @@ public void showUserHeader() {
         }
     }
 
-    /**
-     * Validates password based on role-specific requirements.
-     * 
-     * @param password the password to validate
-     * @return error message if invalid, null if valid
-     */
     private String validatePassword(String password) {
         if (password.contains(" ")) {
             return "Password cannot contain spaces.";
@@ -454,12 +340,6 @@ public void showUserHeader() {
         }
     }
 
-    /**
-     * Validates manager password (relaxed rules).
-     * 
-     * @param password password to validate
-     * @return error message or null
-     */
     private String validateManagerPassword(String password) {
         if (password.length() < 2 || password.length() > 16) {
             return "Password must be between 2 and 16 characters.";
@@ -476,13 +356,7 @@ public void showUserHeader() {
 
         return null; // Valid
     }
-
-    /**
-     * Validates standard password (strict rules).
-     * 
-     * @param password password to validate
-     * @return error message or null
-     */
+    
     private String validateStandardPassword(String password) {
         if (password.length() < 8 || password.length() > 16) {
             return "Password must be between 8 and 16 characters.";
@@ -507,12 +381,6 @@ public void showUserHeader() {
         return null; // Valid
     }
 
-    /**
-     * Helper method for Manager password validation (kept for compatibility).
-     * 
-     * @param password password to validate
-     * @return true if valid, false otherwise
-     */
     protected boolean isValidManagerPassword(String password) {
         return validateManagerPassword(password) == null;
     }
@@ -520,29 +388,6 @@ public void showUserHeader() {
     // CONTACTS MENU (Main Contact Operations)
     // ==========================================
     
-    /**
-     * Main contacts menu for viewing, searching, and sorting contacts.
-     * <p>
-     * This method provides a comprehensive interface for contact management:
-     * <ul>
-     *   <li>List all contacts with pagination (10 per page)</li>
-     *   <li>Search by single field (9 options)</li>
-     *   <li>Search by multiple fields (2-4 fields)</li>
-     *   <li>Sort current list (by first/last name, asc/desc)</li>
-     *   <li>Navigate pages (next, previous, jump to page)</li>
-     * </ul>
-     * </p>
-     * 
-     * <p><b>Navigation Commands:</b></p>
-     * <ul>
-     *   <li>1-4: Menu options</li>
-     *   <li>n: Next page</li>
-     *   <li>p: Previous page</li>
-     *   <li>j: Jump to specific page</li>
-     * </ul>
-     * 
-     * <p><b>Pagination:</b> Shows 10 contacts per page with visual progress bar.</p>
-     */
     protected void contactsMenu() {
         boolean running = true;
 
@@ -611,9 +456,6 @@ public void showUserHeader() {
     // CONTACTS MENU - OPTION 1: LIST ALL
     // ==========================================
     
-    /**
-     * Handles listing all contacts.
-     */
     private void handleListAllContacts() {
     if (!hasEverShownList || visibleList.isEmpty() || 
         confirmYesNo("replace the CURRENT visible list with ALL contacts")) {
@@ -640,12 +482,6 @@ public void showUserHeader() {
     // CONTACTS MENU - OPTION 2: SEARCH
     // ==========================================
     
-    /**
-     * Handles search menu (single or multi-field).
-     */
-    /**
-     * Handles search menu (single or multi-field).
-     */
     private void handleSearchContacts() {
         boolean searchMenuRunning = true;
         
@@ -702,12 +538,6 @@ public void showUserHeader() {
     // CONTACTS MENU - OPTION 3: SORT
     // ==========================================
     
-    /**
-     * Handles sorting the current list.
-     */
-    /**
-     * Handles sorting the current list.
-     */
  private void handleSortContacts() {
         if (!hasEverShownList || visibleList.isEmpty()) {
             System.out.println(RED + "Cannot sort empty list." + RESET);
@@ -783,9 +613,6 @@ public void showUserHeader() {
     // PAGINATION NAVIGATION
     // ==========================================
     
-    /**
-     * Handles "next page" navigation.
-     */
     private void handleNextPage() {
         if (!hasEverShownList || visibleList.isEmpty()) {
             System.out.println(RED + "No list to paginate." + RESET);
@@ -801,9 +628,6 @@ public void showUserHeader() {
         }
     }
 
-    /**
-     * Handles "previous page" navigation.
-     */
     private void handlePreviousPage() {
         if (!hasEverShownList || visibleList.isEmpty()) {
             System.out.println(RED + "No list to paginate." + RESET);
@@ -819,9 +643,6 @@ public void showUserHeader() {
         }
     }
 
-    /**
-     * Handles "jump to page" navigation.
-     */
     private void handleJumpToPage() {
         if (!hasEverShownList || visibleList.isEmpty()) {
             System.out.println(RED + "No list to jump pages." + RESET);
@@ -851,10 +672,6 @@ public void showUserHeader() {
     // PAGINATION DISPLAY
     // ==========================================
     
-    /**
-     * Prints the visible list with pagination.
-     * Shows 10 contacts per page with progress bar.
-     */
     protected void printVisibleListPaginated() {
         int totalContacts = visibleList.size();
         int totalPages = (int) Math.ceil((double) totalContacts / PAGE_SIZE);
@@ -875,13 +692,6 @@ public void showUserHeader() {
                          "  " + progressBar(currentPage, totalPages));
     }
 
-    /**
-     * Creates a visual progress bar for pagination.
-     * 
-     * @param current current page (0-indexed)
-     * @param total total pages
-     * @return progress bar string (■■■□□)
-     */
     protected String progressBar(int current, int total) {
         StringBuilder bar = new StringBuilder();
         for (int i = 0; i < total; i++) {
@@ -893,30 +703,6 @@ public void showUserHeader() {
     // SINGLE FIELD SEARCH
     // ==========================================
     
-    /**
-     * Handles single field search with 9 search options.
-     * <p>
-     * Available search fields:
-     * <ol>
-     *   <li>First Name</li>
-     *   <li>Middle Name</li>
-     *   <li>Last Name</li>
-     *   <li>Nickname</li>
-     *   <li>City</li>
-     *   <li>Phone (searches phone_primary)</li>
-     *   <li>Birth Year (YYYY format)</li>
-     *   <li>Birth Month (1-12)</li>
-     *   <li>LinkedIn (y/n for has/doesn't have)</li>
-     * </ol>
-     * </p>
-     * 
-     * <p>Special value "null0" searches for empty/null fields.</p>
-     */
-   /**
-     * Handles single field search.
-     * 
-     * @return true if search completed, false if cancelled
-     */
     private boolean handleSingleFieldSearch() {
         if (!hasEverShownList || visibleList.isEmpty() || 
             confirmYesNo("replace the CURRENT visible list with search results")) {
@@ -988,12 +774,6 @@ public void showUserHeader() {
         return false;  // User said no to confirmYesNo
     }
 
-    /**
-     * Gets and validates search value for a specific field.
-     * 
-     * @param fieldNum field number (1-9)
-     * @return validated search value, or null if invalid
-     */
     private String getSearchValueForField(int fieldNum) {
         while (true) {
             Group22.clearConsole();
@@ -1050,9 +830,6 @@ public void showUserHeader() {
         }
     }
 
-    /**
-     * Gets search guide text for a field.
-     */
     private String getSearchGuide(int fieldNum) {
         return switch (fieldNum) {
             case 1, 2, 3, 4 -> "Letters, spaces and apostrophes only. Example: Mikael, O'Neil";
@@ -1065,9 +842,6 @@ public void showUserHeader() {
         };
     }
 
-    /**
-     * Gets display name for a field number.
-     */
     private String getFieldDisplayName(int fieldNum) {
         return switch (fieldNum) {
             case 1 -> "First Name";
@@ -1083,13 +857,6 @@ public void showUserHeader() {
         };
     }
 
-    /**
-     * Validates search input for a field.
-     * 
-     * @param fieldNum field number
-     * @param value input value
-     * @return error message if invalid, null if valid
-     */
     private String validateSearchInput(int fieldNum, String value) {
         boolean valid;
         
@@ -1161,9 +928,6 @@ public void showUserHeader() {
         return null; // Valid
     }
 
-    /**
-     * Maps field number to database column name.
-     */
     private String mapFieldNumberToColumn(int fieldNum) {
         return switch (fieldNum) {
             case 1 -> "first_name";
@@ -1178,13 +942,6 @@ public void showUserHeader() {
         };
     }
 
-    /**
-     * Processes search value for special cases (month, LinkedIn).
-     * 
-     * @param fieldNum field number
-     * @param value original value
-     * @return processed value for SQL query
-     */
     private String processSearchValue(int fieldNum, String value) {
         if (value.equalsIgnoreCase("null0")) {
             return value;
@@ -1209,13 +966,6 @@ public void showUserHeader() {
         return value;
     }
 
-    /**
-     * Performs database search on a single column.
-     * 
-     * @param column database column name
-     * @param value search value
-     * @return list of matching contacts
-     */
     protected List<Contact> searchContacts(String column, String value) {
         List<Contact> results = new ArrayList<>();
 
@@ -1278,23 +1028,6 @@ public void showUserHeader() {
     // MULTI-FIELD SEARCH
     // ==========================================
     
-    /**
-     * Handles multi-field search (2-4 fields).
-     * <p>
-     * Allows searching by multiple fields simultaneously with AND logic.
-     * User selects 2-4 fields from available options, enters values for each,
-     * and receives contacts matching ALL criteria.
-     * </p>
-     * 
-     * <p><b>Available Fields:</b> first_name, middle_name, last_name, nickname,
-     * city, phone_primary, phone_secondary, email, linkedin_url, birth_date</p>
-     * 
-     * <p><b>Special Values:</b></p>
-     * <ul>
-     *   <li>"null0" - Search for empty/null values</li>
-     *   <li>"y"/"n" for LinkedIn - Has/doesn't have LinkedIn</li>
-     * </ul>
-     */
     private boolean handleMultiFieldSearch() {
         clearScreen();
         
@@ -1357,14 +1090,6 @@ public void showUserHeader() {
         return true;  // ← TRUE DÖNDÜR (completed)
     }
 
-    /**
-     * Allows user to select a field for multi-field search.
-     * 
-     * @param fieldNumber which field number (1st, 2nd, 3rd, 4th)
-     * @param alreadySelected previously selected fields
-     * @param currentIndex current index in array
-     * @return selected field name, or null if error
-     */
     private String selectMultiFieldOption(int fieldNumber, String[] alreadySelected, int currentIndex) {
         while (true) {
             clearScreen();
@@ -1425,12 +1150,6 @@ try {
         }
     }
 
-    /**
-     * Gets search value for a multi-field search field.
-     * 
-     * @param fieldName database column name
-     * @return search value, or null if error
-     */
     private String getMultiFieldValue(String fieldName) {
         while (true) {
             Group22.clearConsole();
@@ -1483,9 +1202,6 @@ try {
         }
     }
 
-    /**
-     * Displays guide for a multi-field search field.
-     */
     private void displayMultiFieldGuide(String fieldName) {
         String guide = switch (fieldName) {
             case "first_name", "middle_name", "last_name", "nickname" ->
@@ -1508,9 +1224,6 @@ try {
         }
     }
 
-    /**
-     * Validates input for multi-field search.
-     */
     private boolean validateMultiFieldInput(String fieldName, String value) {
         return switch (fieldName) {
             case "first_name", "middle_name", "last_name", "nickname" ->
@@ -1540,9 +1253,6 @@ try {
         };
     }
 
-    /**
-     * Gets display name for a database column.
-     */
     private String getDisplayNameForColumn(String column) {
         for (String[] field : MULTI_FIELDS) {
             if (field[0].equals(column)) {
@@ -1552,13 +1262,6 @@ try {
         return column;
     }
 
-    /**
-     * Performs multi-field search in database.
-     * 
-     * @param fields array of field names
-     * @param values array of search values
-     * @return list of matching contacts
-     */
     protected List<Contact> multiFieldSearch(String[] fields, String[] values) {
         List<Contact> results = new ArrayList<>();
         
@@ -1640,11 +1343,6 @@ try {
     // FETCH ALL CONTACTS
     // ==========================================
     
-    /**
-     * Fetches all contacts from the database.
-     * 
-     * @return list of all contacts
-     */
     protected List<Contact> fetchAllContacts() {
         List<Contact> contacts = new ArrayList<>();
 
@@ -1678,11 +1376,6 @@ try {
     // SORT METHODS
     // ==========================================
     
-    /**
-     * Asks user which field to sort by.
-     * 
-     * @return 1 for First Name, 2 for Last Name, 0 for Cancel
-     */
     protected int askSortField() {
         while (true) {
             System.out.println(GREEN + "[1] - First Name" + RESET);
@@ -1704,11 +1397,6 @@ try {
         }
     }
 
-    /**
-     * Asks user for sort order (ascending or descending).
-     * 
-     * @return 1 for ascending, 2 for descending, 0 for Cancel
-     */
     protected int askSortOrder() {
         while (true) {
             System.out.println(GREEN + "1 - ASC | 2 - DESC" + RESET);
@@ -1733,57 +1421,22 @@ try {
     // VALIDATION HELPER METHODS
     // ==========================================
     
-    /**
-     * Validates a person name (first, middle, last, nickname).
-     * Allows: letters (including Turkish), spaces, apostrophes.
-     * 
-     * @param name the name to validate
-     * @return true if valid, false otherwise
-     */
     protected boolean isValidPersonName(String name) {
         return name != null && name.matches("[A-Za-zÇçĞğİıÖöŞşÜü' ]+");
     }
 
-    /**
-     * Validates a city name.
-     * Allows: letters (including Turkish), spaces, apostrophes, dots, dashes.
-     * 
-     * @param city the city to validate
-     * @return true if valid, false otherwise
-     */
     protected boolean isValidCity(String city) {
         return city != null && city.matches("[A-Za-zÇçĞğİıÖöŞşÜü'.\\- ]+");
     }
 
-    /**
-     * Validates a phone number.
-     * Allows: optional +, followed by digits.
-     * 
-     * @param phone the phone to validate
-     * @return true if valid, false otherwise
-     */
     protected boolean isValidPhone(String phone) {
         return phone != null && phone.matches("[+0-9]+");
     }
 
-    /**
-     * Validates a birth date string.
-     * Allows: numbers and dashes (expects yyyy-MM-dd format).
-     * 
-     * @param dateStr the date string to validate
-     * @return true if valid format, false otherwise
-     */
     protected boolean isValidBirthDate(String dateStr) {
         return dateStr != null && dateStr.matches("[0-9\\-]+");
     }
 
-    /**
-     * Validates an email address.
-     * Allows: non-empty strings (basic check).
-     * 
-     * @param email the email to validate
-     * @return true if not null/empty, false otherwise
-     */
     protected boolean isValidEmail(String email) {
         if (email == null) {
             return false;
@@ -1794,23 +1447,10 @@ try {
         return !email.trim().isEmpty();
     }
 
-    /**
-     * Validates a name (simple version for backward compatibility).
-     * Allows: letters (including Turkish) and apostrophes only (no spaces).
-     * 
-     * @param name the name to validate
-     * @return true if valid, false otherwise
-     */
     protected boolean isValidName(String name) {
         return name != null && name.matches("[A-Za-zÇçĞğİıÖöŞşÜü']+");
     }
-
-    /**
-     * Checks if a string is blank (null or empty after trimming).
-     * 
-     * @param str the string to check
-     * @return true if blank, false otherwise
-     */
+    
     protected boolean isBlank(String str) {
         return str == null || str.trim().isEmpty();
     }
@@ -1819,10 +1459,6 @@ try {
     // UTILITY METHODS
     // ==========================================
     
-    /**
-     * Clears the console screen.
-     * Cross-platform compatible (Windows and Unix/Linux/Mac).
-     */
     protected void clearScreen() {
         try {
             String os = System.getProperty("os.name");
@@ -1840,12 +1476,6 @@ try {
         }
     }
 
-    /**
-     * Confirms a yes/no action with the user.
-     * 
-     * @param action description of the action to confirm
-     * @return true if user confirms (y), false otherwise (n)
-     */
     protected boolean confirmYesNo(String action) {
         while (true) {
             System.out.print(CYAN + "This will " + action + ". Continue (" +
@@ -1863,10 +1493,6 @@ try {
         }
     }
 
-    /**
-     * Pauses execution until user presses ENTER.
-     * Displays "Press ENTER to continue..." message.
-     */
     protected void pause() {
         System.out.println();
         System.out.println("Press ENTER to continue...");
@@ -1876,11 +1502,7 @@ try {
             // Ignore input errors
         }
     }
-
-    /**
-     * Logs out the user.
-     * Displays logout message and returns control to main menu.
-     */
+    
     public void logout() {
         System.out.println(CYAN + "Logging out..." + RESET);
         try {
@@ -1894,24 +1516,12 @@ try {
     // ABSTRACT METHOD (must be implemented by subclasses)
     // ==========================================
     
-    /**
-     * Displays the role-specific menu.
-     * <p>
-     * Each role (Tester, Junior Developer, Senior Developer, Manager)
-     * must implement this method to show their own menu options.
-     * </p>
-     */
     public abstract void showMenu();
 
     // ==========================================
     // toString() METHOD
     // ==========================================
     
-    /**
-     * Returns a string representation of this Role.
-     * 
-     * @return string with role type, user ID, and username
-     */
     @Override
     public String toString() {
         return "Role{" +
@@ -1922,3 +1532,4 @@ try {
                 '}';
     }
 }
+
