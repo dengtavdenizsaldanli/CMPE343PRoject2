@@ -1,105 +1,18 @@
 import java.sql.*;
 import java.util.*;
 
-/**
- * SeniorDeveloper role class with full CRUD permissions on contacts.
- * <p>
- * SeniorDeveloper is the most powerful role for contact management,
- * extending Junior Developer capabilities with the ability to add new
- * contacts, delete existing contacts, and undo recent operations.
- * </p>
- * 
- * <p><b>Permissions:</b></p>
- * <ul>
- *   <li>✅ List all contacts (inherited from Tester)</li>
- *   <li>✅ Search contacts (inherited from Tester)</li>
- *   <li>✅ Sort contacts (inherited from Tester)</li>
- *   <li>✅ Update existing contacts (inherited from Junior Developer)</li>
- *   <li>✅ <b>Add new contacts</b> (NEW - Senior Developer only)</li>
- *   <li>✅ <b>Add multiple contacts in batch</b> (NEW - Senior Developer only)</li>
- *   <li>✅ <b>Delete existing contacts</b> (NEW - Senior Developer only)</li>
- *   <li>✅ <b>Delete multiple contacts</b> (NEW - Senior Developer only)</li>
- *   <li>✅ <b>Undo last operation</b> (NEW - Senior Developer only)</li>
- *   <li>✅ Change own password (inherited)</li>
- *   <li>✅ Logout (inherited)</li>
- *   <li>❌ User management (not allowed - requires Manager)</li>
- * </ul>
- * 
- * <p><b>UNDO System:</b></p>
- * <ul>
- *   <li>Maintains a stack of recent operations (last 10)</li>
- *   <li>Supports undo for: ADD, UPDATE, DELETE operations</li>
- *   <li>ADD operation → Undo deletes the added contact</li>
- *   <li>UPDATE operation → Undo restores old values</li>
- *   <li>DELETE operation → Undo re-inserts the contact</li>
- *   <li>Undo history is cleared on logout</li>
- * </ul>
- * 
- * <p><b>Data Validation:</b></p>
- * <ul>
- *   <li>All inputs validated using Contact class validation methods</li>
- *   <li>Required fields: firstName, lastName, phonePrimary, email</li>
- *   <li>Optional fields: middleName, nickname, city, phoneSecondary, linkedinUrl, birthDate</li>
- *   <li>Turkish character support (Ç, Ğ, İ, Ö, Ş, Ü)</li>
- * </ul>
- * 
- * @author Group 22
- * @version 1.0
- * @since 2024
- * @see JuniorDeveloper
- * @see Contact
- */
+// Group 31
+
 public class SeniorDeveloper extends JuniorDeveloper {
 
-    // ==========================================
-    // UNDO SYSTEM
-    // ==========================================
-    
-    /**
-     * Stack to store recent operations for undo functionality.
-     * Limited to last 10 operations to prevent memory overflow.
-     */
     private Stack<ContactOperation> undoStack = new Stack<>();
-    
-    /**
-     * Maximum number of operations to keep in undo stack.
-     */
     private static final int MAX_UNDO_HISTORY = 10;
 
-    /**
-     * Constructs a SeniorDeveloper role with specified user credentials.
-     * <p>
-     * Initializes the Senior Developer role and prepares the undo stack.
-     * </p>
-     * 
-     * @param id user ID from database (unique identifier)
-     * @param u username for authentication
-     * @param n first name of the user
-     * @param s surname (last name) of the user
-     */
     public SeniorDeveloper(int id, String u, String n, String s) {
         super(id, u, n, s);
         this.role = "Senior Developer";
     }
 
-    /**
-     * Displays and manages the Senior Developer role menu.
-     * <p>
-     * Extends Junior Developer menu with additional options for
-     * adding contacts, deleting contacts, and undo operations.
-     * </p>
-     * 
-     * <p><b>Menu Options:</b></p>
-     * <ol>
-     *   <li>Contacts Menu - View, search, sort</li>
-     *   <li>Update Contact - Modify existing contact</li>
-     *   <li><b>Add Contact(s)</b> - Add new contact(s) (NEW)</li>
-     *   <li><b>Delete Contact(s)</b> - Remove contact(s) (NEW)</li>
-     *   <li><b>Undo Last Operation</b> - Revert last change (NEW)</li>
-     *   <li>Change Password - Update own password</li>
-     *   <li>Logout - Exit to main menu</li>
-     * </ol>
-     */
     @Override
     public void showMenu() {
         boolean running = true;
@@ -140,31 +53,19 @@ public class SeniorDeveloper extends JuniorDeveloper {
         System.out.print("\n" + CYAN + "Pick an Option (1-7): " + RESET);
     }
 
-    /**
-     * Reads user input.
-     */
     private String getUserChoice() {
         return sc.nextLine().trim();
     }
 
-    /**
-     * Validates menu choice (1-7).
-     */
     private boolean isValidChoice(String choice) {
         return choice.matches("[1-7]");
     }
 
-    /**
-     * Handles invalid choices.
-     */
     private void handleInvalidChoice() {
         System.out.println(RED + "Invalid choice. Please enter 1-7." + RESET);
         pause();
     }
 
-    /**
-     * Processes menu choice.
-     */
     private boolean processMenuChoice(String choice) {
         switch (choice) {
             case "1" -> {
@@ -240,7 +141,6 @@ public class SeniorDeveloper extends JuniorDeveloper {
         String confirm = sc.nextLine().trim();
 
         if (confirm.equalsIgnoreCase("y")) {
-            // Clear undo stack on logout for security
             undoStack.clear();
             logout();
             return false;
@@ -255,20 +155,6 @@ public class SeniorDeveloper extends JuniorDeveloper {
     // ADD CONTACT FUNCTIONALITY (NEW!)
     // ==========================================
 
-    /**
-     * Handles adding new contact(s).
-     * <p>
-     * Presents options to add a single contact or multiple contacts in batch.
-     * Each added contact is recorded in the undo stack for potential reversal.
-     * </p>
-     */
-    /**
-     * Handles adding new contact(s).
-     * <p>
-     * Presents options to add a single contact or multiple contacts in batch.
-     * Each added contact is recorded in the undo stack for potential reversal.
-     * </p>
-     */
     private void handleAddContact() {
         boolean addMenuRunning = true;
         
@@ -314,13 +200,6 @@ public class SeniorDeveloper extends JuniorDeveloper {
         }
     }
 
-    /**
-     * Adds a single contact with full validation.
-     * <p>
-     * Prompts user for all contact fields, validates each input,
-     * inserts into database, and records operation for undo.
-     * </p>
-     */
      private boolean addSingleContact() {
         clearScreen();
         System.out.println(CYAN + "=== Add New Contact ===" + RESET);
@@ -445,9 +324,6 @@ public class SeniorDeveloper extends JuniorDeveloper {
         }
     }
 
-    /**
-     * Adds multiple contacts in batch mode.
-     */
     private void addMultipleContacts() {
         clearScreen();
         System.out.println(CYAN + "=== Add Multiple Contacts (Batch Mode) ===" + RESET);
@@ -541,11 +417,6 @@ public class SeniorDeveloper extends JuniorDeveloper {
         }
     }
 
-    /**
-     * Gets optional input with validation.
-     * 
-     * @return input string if valid, empty string if skipped, null if cancelled
-     */
     private String getOptionalInput(String fieldName, java.util.function.Predicate<String> validator) {
         System.out.println(BLUE + fieldName + " (Optional - press ENTER to skip, 0 to cancel):" + RESET);
         System.out.print("  Value: ");
@@ -568,11 +439,6 @@ public class SeniorDeveloper extends JuniorDeveloper {
         }
     }
 
-    /**
-     * Inserts contact into database.
-     * 
-     * @return new contact ID, or -1 on failure
-     */
     private int insertContactToDatabase(String firstName, String middleName, String lastName,
                                        String nickname, String city, String phonePrimary,
                                        String phoneSecondary, String email, String linkedinUrl,
@@ -611,9 +477,6 @@ public class SeniorDeveloper extends JuniorDeveloper {
         return -1;
     }
 
-    /**
-     * Fetches contact by ID (used for undo).
-     */
     private Contact fetchContactById(int contactId) {
         String sql = "SELECT * FROM contacts WHERE contact_id = ?";
 
@@ -649,12 +512,6 @@ public class SeniorDeveloper extends JuniorDeveloper {
     // DELETE CONTACT FUNCTIONALITY (NEW!)
     // ==========================================
 
-    /**
-     * Handles deleting contact(s).
-     */
-    /**
-     * Handles deleting contact(s).
-     */
     private void handleDeleteContact() {
         boolean deleteMenuRunning = true;
         
@@ -702,11 +559,6 @@ public class SeniorDeveloper extends JuniorDeveloper {
         }
     }
 
-    /**
-     * Deletes a single contact.
-     * 
-     * @return true if contact deleted, false if cancelled
-     */
     private boolean deleteSingleContact() {
         System.out.println();
         System.out.print(CYAN + "Enter Contact ID to delete (or 0 to cancel): " + RESET);
@@ -775,11 +627,7 @@ public class SeniorDeveloper extends JuniorDeveloper {
             return false;
         }
     }
-/**
-     * Deletes multiple contacts.
-     * 
-     * @return true if contacts deleted, false if cancelled
-     */
+
     private void deleteMultipleContacts() {
         System.out.println();
         System.out.println(CYAN + "Enter contact IDs separated by commas (e.g., 5,12,23)" + RESET);
@@ -892,9 +740,7 @@ public class SeniorDeveloper extends JuniorDeveloper {
         // Note: Method returns here after success
         // handleDeleteContact() will exit loop and go to main menu
     }
-    /**
-     * Deletes contact from database.
-     */
+   
     private boolean deleteContactFromDatabase(int contactId) {
         String sql = "DELETE FROM contacts WHERE contact_id = ?";
 
@@ -911,12 +757,9 @@ public class SeniorDeveloper extends JuniorDeveloper {
     }
 
     // ==========================================
-    // UNDO FUNCTIONALITY (NEW!)
+    // UNDO FUNCTIONALITY
     // ==========================================
 
-    /**
-     * Handles undo operation.
-     */
     private void handleUndo() {
         clearScreen();
         System.out.println(PURPLE + "╔════════════════════════════════════════════════╗" + RESET);
@@ -956,9 +799,6 @@ public class SeniorDeveloper extends JuniorDeveloper {
         pause();
     }
 
-    /**
-     * Adds operation to undo stack.
-     */
     private void addToUndoStack(ContactOperation operation) {
         // Limit stack size
         if (undoStack.size() >= MAX_UNDO_HISTORY) {
@@ -971,17 +811,11 @@ public class SeniorDeveloper extends JuniorDeveloper {
     // UNDO OPERATION CLASSES
     // ==========================================
 
-    /**
-     * Abstract base class for undoable operations.
-     */
     private abstract class ContactOperation {
         abstract boolean revert();
         abstract String getDescription();
     }
 
-    /**
-     * Represents an ADD operation (undo = delete).
-     */
     private class AddOperation extends ContactOperation {
         private Contact addedContact;
 
@@ -1001,9 +835,6 @@ public class SeniorDeveloper extends JuniorDeveloper {
         }
     }
 
-    /**
-     * Represents a DELETE operation (undo = re-insert).
-     */
     private class DeleteOperation extends ContactOperation {
         private Contact deletedContact;
 
@@ -1048,9 +879,6 @@ public class SeniorDeveloper extends JuniorDeveloper {
         }
     }
 
-    /**
-     * Error handler.
-     */
     private void handleUnexpectedError(Exception e) {
         System.err.println();
         System.err.println(RED + "╔════════════════════════════════════════════════╗" + RESET);
@@ -1071,4 +899,5 @@ public class SeniorDeveloper extends JuniorDeveloper {
                 '}';
     }
 }
+
 
