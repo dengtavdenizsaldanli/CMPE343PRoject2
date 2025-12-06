@@ -1,47 +1,3 @@
-/**
- * Tester role class with read-only permissions on contacts.
- * <p>
- * Tester is the most restricted role in the Contact Management System.
- * Users with this role can view and search contacts but cannot modify,
- * add, or delete any data.
- * </p>
- * 
- * <p><b>Permissions:</b></p>
- * <ul>
- *   <li>✅ List all contacts (view-only)</li>
- *   <li>✅ Search contacts by single field</li>
- *   <li>✅ Search contacts by multiple fields</li>
- *   <li>✅ Sort contacts by any field (ascending/descending)</li>
- *   <li>✅ Change own password</li>
- *   <li>✅ Logout</li>
- *   <li>❌ Update contacts (not allowed)</li>
- *   <li>❌ Add contacts (not allowed)</li>
- *   <li>❌ Delete contacts (not allowed)</li>
- *   <li>❌ User management (not allowed)</li>
- * </ul>
- * 
- * <p><b>Typical Use Case:</b></p>
- * <p>
- * Testers use this role to verify contact data quality, test search
- * functionality, and ensure data integrity without risk of accidental
- * modifications.
- * </p>
- * 
- * <p><b>Menu Structure:</b></p>
- * <ol>
- *   <li>Contacts Menu - Access to list/search/sort operations</li>
- *   <li>Change Password - Update own password</li>
- *   <li>Logout - Exit to main menu</li>
- * </ol>
- * 
- * @author Group 22
- * @version 1.0
- * @since 2024
- * @see Role
- * @see JuniorDeveloper
- * @see SeniorDeveloper
- * @see Manager
- */
 public class Tester extends Role {
 
     public Tester(int id, String u, String n, String s) {
@@ -187,3 +143,4 @@ public class Tester extends Role {
                 '}';
     }
 }
+
