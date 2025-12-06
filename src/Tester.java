@@ -140,7 +140,8 @@ public class Tester extends Role {
                 "id=" + userId +
                 ", username='" + username + '\'' +
                 ", name='" + name + " " + surname + '\'' +
-                '}';
+                '};
     }
 }
+
 
