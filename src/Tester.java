@@ -134,14 +134,14 @@ public class Tester extends Role {
         pause();
     }
 
-    @Override
+        @Override
     public String toString() {
         return "Tester{" +
                 "id=" + userId +
                 ", username='" + username + '\'' +
                 ", name='" + name + " " + surname + '\'' +
-                '};
-    }
-}
+                '}';
+    }
+
 
 
