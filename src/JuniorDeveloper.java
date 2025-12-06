@@ -126,7 +126,7 @@ public class JuniorDeveloper extends Role {
     // UPDATE CONTACT FUNCTIONALITY (NEW!)
     // ==========================================
 
-    protected void handleUpdateContact() {
+   protected void handleUpdateContact() {
         clearScreen();
         System.out.println(CYAN + "╔════════════════════════════════════════════════╗" + RESET);
         System.out.println(CYAN + "║          UPDATE CONTACT                        ║" + RESET);
@@ -140,16 +140,16 @@ public class JuniorDeveloper extends Role {
                 return; // User cancelled
             }
 
-            // Step 2: Fetch current contact
-            Contact contact = fetchContactById(contactId);
-            if (contact == null) {
+            // Step 2: Fetch OLD contact (BEFORE update) for undo
+            Contact oldContact = fetchContactById(contactId);
+            if (oldContact == null) {
                 System.out.println(RED + "Contact with ID " + contactId + " not found!" + RESET);
                 pause();
                 return;
             }
 
             // Step 3: Display current contact
-            displayContactInfo(contact);
+            displayContactInfo(oldContact);
 
             // Step 4: Select field to update
             String field = selectFieldToUpdate();
@@ -170,6 +170,18 @@ public class JuniorDeveloper extends Role {
             if (success) {
                 System.out.println();
                 System.out.println(GREEN + "✅ Contact updated successfully!" + RESET);
+                
+                // Fetch NEW contact (AFTER update) for undo
+                Contact newContact = fetchContactById(contactId);
+                
+                // Add to undo stack (only if user is SeniorDeveloper)
+                if (this instanceof SeniorDeveloper && newContact != null) {
+                    ((SeniorDeveloper) this).addUpdateToUndoStack(oldContact, newContact);
+                    
+                    // Ask for immediate undo (SeniorDeveloper only)
+                    ((SeniorDeveloper) this).askForImmediateUndoPublic();
+                }
+                
             } else {
                 System.out.println();
                 System.out.println(RED + "❌ Update failed. Please try again." + RESET);
@@ -421,3 +433,4 @@ public class JuniorDeveloper extends Role {
     }
 
 }
+
