@@ -8,17 +8,10 @@ public class Manager extends Role {
     // ==========================================
     // CONSTANTS FOR VALIDATION
     // ==========================================
-    
-    /** Maximum length for username field. */
+
     private static final int MAX_USERNAME_LENGTH = 50;
-    
-    /** Maximum length for name fields (first name, surname). */
     private static final int MAX_NAME_LENGTH = 100;
-    
-    /** Maximum length for password field. */
     private static final int MAX_PASSWORD_LENGTH = 255;
-    
-    /** Minimum length for password field. */
     private static final int MIN_PASSWORD_LENGTH = 1;
 
     // ==========================================
@@ -41,7 +34,6 @@ public class Manager extends Role {
                 clearScreen();
                 showUserHeader();
 
-                // Display menu options
                 System.out.println(GREEN + "1- Change Password" + RESET);
                 System.out.println(GREEN + "2- Contacts Statistical Info" + RESET);
                 System.out.println(GREEN + "3- List All Users" + RESET);
@@ -60,14 +52,12 @@ public class Manager extends Role {
                 }
                 choice = choice.trim();
 
-                // Validate input
                 if (!choice.matches("10|[1-9]")) {
                     System.out.println(RED + "Invalid choice. Enter (1-10)." + RESET);
                     pause(sc);
                     continue;
                 }
 
-                // Process choice
                 switch (choice) {
                     case "1" -> {
                         clearScreen();
@@ -193,8 +183,7 @@ public class Manager extends Role {
             System.out.println("Search Contacts (Multi-Field)");
             System.out.println("-----------------------------");
             
-            // Use inherited multi-field search from Role
-            super.contactsMenu(); // This includes multi-field search option
+            super.contactsMenu();
             
             System.out.println();
             System.out.println(PURPLE + "1- Search Again" + RESET);
@@ -313,7 +302,6 @@ public class Manager extends Role {
         if (input == null) {
             return "";
         }
-        // Remove SQL keywords and special characters
         return input.replaceAll("[;'\"\\\\]", "").trim();
     }
 
@@ -332,13 +320,11 @@ public class Manager extends Role {
         try {
             scanner.nextLine();
         } catch (Exception e) {
-            // Ignore
         }
     }
     // ==========================================
     // OPTION 2: ADVANCED CONTACT STATISTICS (COMPLETELY NEW)
     // ==========================================
-    
     
     private void showContactsStatisticalInfo() {
         clearScreen();
@@ -348,36 +334,20 @@ public class Manager extends Role {
         System.out.println();
 
         try (Connection conn = DatabaseConnection.getConnection()) {
-
-            // 1. Overview Statistics
             showOverviewStatistics(conn);
             System.out.println();
-
-            // 2. Geographic Distribution
             showGeographicDistribution(conn);
             System.out.println();
-
-            // 3. Age Demographics
             showAgeDemographics(conn);
             System.out.println();
-
-            // 4. Email Domain Analysis
             showEmailDomainAnalysis(conn);
             System.out.println();
-
-            // 5. Contact Completeness Score
             showDataCompleteness(conn);
             System.out.println();
-
-            // 6. Birth Month Distribution
             showBirthMonthDistribution(conn);
             System.out.println();
-
-            // 7. LinkedIn Adoption by Age
             showLinkedInAdoptionByAge(conn);
             System.out.println();
-
-            // 8. Growth Trends (Last 30 Days)
             showGrowthTrends(conn);
             System.out.println();
 
@@ -441,7 +411,6 @@ public class Manager extends Role {
                          "GROUP BY city ORDER BY count DESC LIMIT 5";
             ResultSet rs = stmt.executeQuery(sql);
 
-            // Get total in separate statement
             int total = 0;
             try (Statement stmt2 = conn.createStatement()) {
                 ResultSet rsTotal = stmt2.executeQuery(
@@ -641,7 +610,6 @@ public class Manager extends Role {
                 }
             }
 
-            // Display in 2 columns (6 months each)
             for (int i = 0; i < 6; i++) {
                 String bar1 = "█".repeat(counts[i]);
                 String bar2 = "█".repeat(counts[i + 6]);
@@ -707,7 +675,6 @@ public class Manager extends Role {
                 }
             }
             
-            // Display results
             for (int i = 0; i < results.size(); i++) {
                 String result = results.get(i);
                 if (i == results.size() - 1 && result.contains(maxPercentage + "%")) {
@@ -832,7 +799,6 @@ public class Manager extends Role {
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
 
-            // Print header
             System.out.println(GREEN + "════════════════════════════════════════════════════════════════════════════" + RESET);
             System.out.printf("%-8s %-20s %-15s %-15s %-20s%n", 
                 "ID", "Username", "First Name", "Surname", "Role");
@@ -846,7 +812,6 @@ public class Manager extends Role {
                 String surname = rs.getString("surname");
                 String role = rs.getString("role");
 
-                // Highlight current user
                 if (id == this.userId) {
                     System.out.print(CYAN);
                 }
@@ -907,7 +872,7 @@ public class Manager extends Role {
         Connection conn = null;
         try {
             conn = DatabaseConnection.getConnection();
-            conn.setAutoCommit(false); // Start transaction
+            conn.setAutoCommit(false);
 
             // Step 2: Fetch current user data
             String fetchSql = "SELECT * FROM users WHERE user_id = ?";
@@ -921,7 +886,6 @@ public class Manager extends Role {
                 return;
             }
 
-            // Display current data
             String currentUsername = rs.getString("username");
             String currentName = rs.getString("name");
             String currentSurname = rs.getString("surname");
@@ -987,7 +951,6 @@ public class Manager extends Role {
                 try {
                     conn.rollback();
                 } catch (SQLException ex) {
-                    // Ignore
                 }
             }
         } finally {
@@ -996,7 +959,6 @@ public class Manager extends Role {
                     conn.setAutoCommit(true);
                     conn.close();
                 } catch (SQLException e) {
-                    // Ignore
                 }
             }
         }
@@ -1011,7 +973,6 @@ public class Manager extends Role {
             return false;
         }
 
-        // Check for duplicates
         String checkSql = "SELECT user_id FROM users WHERE username = ? AND user_id != ?";
         PreparedStatement checkStmt = conn.prepareStatement(checkSql);
         checkStmt.setString(1, newUsername);
@@ -1023,7 +984,6 @@ public class Manager extends Role {
             return false;
         }
 
-        // Update
         String updateSql = "UPDATE users SET username = ? WHERE user_id = ?";
         PreparedStatement updateStmt = conn.prepareStatement(updateSql);
         updateStmt.setString(1, newUsername);
@@ -1104,8 +1064,7 @@ public class Manager extends Role {
             System.out.println(RED + "Passwords do not match." + RESET);
             return false;
         }
-
-        // Validate password (basic check)
+        
         if (newPassword.length() < MIN_PASSWORD_LENGTH || 
             newPassword.length() > MAX_PASSWORD_LENGTH) {
             System.out.println(RED + "Invalid password length." + RESET);
@@ -1124,6 +1083,7 @@ public class Manager extends Role {
             return false;
         }
     }
+    
     // ==========================================
     // OPTION 5: ADD/EMPLOY NEW USER
     // ==========================================
@@ -1138,7 +1098,7 @@ public class Manager extends Role {
         Connection conn = null;
         try {
             conn = DatabaseConnection.getConnection();
-            conn.setAutoCommit(false); // Start transaction
+            conn.setAutoCommit(false);
 
             // Step 1: Get username
             System.out.print(CYAN + "Enter username: " + RESET);
@@ -1153,7 +1113,6 @@ public class Manager extends Role {
                 return;
             }
 
-            // Check if username already exists
             String checkSql = "SELECT user_id FROM users WHERE username = ?";
             PreparedStatement checkStmt = conn.prepareStatement(checkSql);
             checkStmt.setString(1, username);
@@ -1287,7 +1246,6 @@ public class Manager extends Role {
                 try {
                     conn.rollback();
                 } catch (SQLException ex) {
-                    // Ignore
                 }
             }
         } finally {
@@ -1331,7 +1289,6 @@ public class Manager extends Role {
             return;
         }
 
-        // Prevent self-deletion
         if (targetUserId == this.userId) {
             System.out.println(RED + "❌ You cannot delete your own account!" + RESET);
             System.out.println(CYAN + "Please ask another Manager to delete your account if needed." + RESET);
@@ -1341,7 +1298,7 @@ public class Manager extends Role {
         Connection conn = null;
         try {
             conn = DatabaseConnection.getConnection();
-            conn.setAutoCommit(false); // Start transaction
+            conn.setAutoCommit(false);
 
             // Step 2: Fetch user to delete
             String fetchSql = "SELECT * FROM users WHERE user_id = ?";
@@ -1409,7 +1366,6 @@ public class Manager extends Role {
                 try {
                     conn.rollback();
                 } catch (SQLException ex) {
-                    // Ignore
                 }
             }
         } finally {
@@ -1418,7 +1374,6 @@ public class Manager extends Role {
                     conn.setAutoCommit(true);
                     conn.close();
                 } catch (SQLException e) {
-                    // Ignore
                 }
             }
         }
@@ -1429,29 +1384,9 @@ public class Manager extends Role {
     
     @Override
     protected void contactsMenu() {
-        // Use inherited contactsMenu from Role
         super.contactsMenu();
     }
 
-    // ==========================================
-    // NOTE: The following methods are inherited from Role class:
-    // ==========================================
-    // 
-    // • fetchAllContacts() - Fetches all contacts from database
-    // • searchContacts(String column, String value) - Single field search
-    // • multiFieldSearch(String[] fields, String[] values) - Multi-field search
-    // • askSortField() - Prompts user to select sort field
-    // • askSortOrder() - Prompts user to select sort order
-    // 
-    // These methods are already available through inheritance and do not
-    // need to be redefined here. If you see compilation errors related to
-    // these methods, ensure that Role.java is compiled first.
-    // ==========================================
-
-    // ==========================================
-    // toString() METHOD
-    // ==========================================
-    
     @Override
     public String toString() {
         return "Manager{" +
@@ -1461,4 +1396,3 @@ public class Manager extends Role {
                 '}';
     }
 }
-
