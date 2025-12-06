@@ -3,52 +3,6 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.*;
 
-/**
- * Manager role class with user management and statistics permissions.
- * <p>
- * Manager is responsible for administrative tasks including user management
- * and viewing contact statistics. According to project requirements, Manager
- * should NOT have direct contact CRUD operations (add/update/delete contacts).
- * However, this implementation includes contact viewing for convenience.
- * </p>
- * 
- * <p><b>Primary Permissions:</b></p>
- * <ul>
- *   <li>✅ View contacts statistical information</li>
- *   <li>✅ List all users in the system</li>
- *   <li>✅ Update existing user information</li>
- *   <li>✅ Add/employ new users</li>
- *   <li>✅ Delete/fire existing users</li>
- *   <li>✅ Change own password</li>
- *   <li>✅ Logout</li>
- *   <li>⚠️  Contact viewing (not in requirements but included)</li>
- * </ul>
- * 
- * <p><b>Statistical Information Available:</b></p>
- * <ul>
- *   <li>Total number of contacts</li>
- *   <li>Contacts with/without LinkedIn profiles</li>
- *   <li>Most common first and last names</li>
- *   <li>Youngest and oldest contacts</li>
- *   <li>Average age of contacts</li>
- *   <li>Contacts with/without middle names</li>
- *   <li>Contacts with secondary phone numbers</li>
- * </ul>
- * 
- * <p><b>Security Features:</b></p>
- * <ul>
- *   <li>Transaction-based database operations</li>
- *   <li>Input sanitization and validation</li>
- *   <li>PreparedStatements to prevent SQL injection</li>
- *   <li>Self-deletion prevention</li>
- *   <li>Duplicate username detection</li>
- * </ul>
- * 
- * @author Group 22
- * @version 1.0
- * @since 2024
- * @see Role
- */
 public class Manager extends Role {
 
     // ==========================================
@@ -71,14 +25,6 @@ public class Manager extends Role {
     // CONSTRUCTOR
     // ==========================================
     
-    /**
-     * Constructs a Manager role with specified user credentials.
-     * 
-     * @param id user ID from database
-     * @param u username
-     * @param n first name
-     * @param s surname
-     */
     public Manager(int id, String u, String n, String s) {
         super(id, u, n, s, "Manager");
     }
@@ -86,13 +32,6 @@ public class Manager extends Role {
     // MAIN MENU
     // ==========================================
     
-    /**
-     * Displays and manages the Manager role menu.
-     * <p>
-     * Menu provides access to user management, statistics, and system operations.
-     * All operations are wrapped in exception handling for stability.
-     * </p>
-     */
     @Override
     public void showMenu() {
         boolean running = true;
@@ -189,9 +128,6 @@ public class Manager extends Role {
     // SEARCH MENU HANDLERS (Options 8 & 9)
     // ==========================================
     
-    /**
-     * Handles single field search menu (Option 8).
-     */
     private void handleSingleFieldSearchMenu() {
         boolean searchLoop = true;
         while (searchLoop) {
@@ -250,9 +186,6 @@ public class Manager extends Role {
         }
     }
 
-    /**
-     * Handles multi-field search menu (Option 9).
-     */
     private void handleMultiFieldSearchMenu() {
         boolean multiSearchLoop = true;
         while (multiSearchLoop) {
@@ -281,9 +214,6 @@ public class Manager extends Role {
         }
     }
 
-    /**
-     * Searches contacts and returns results for display.
-     */
     private List<Contact> searchContactsWithResults() {
         System.out.println("1 - First Name");
         System.out.println("2 - Last Name");
@@ -318,9 +248,6 @@ public class Manager extends Role {
         return results;
     }
 
-    /**
-     * Sorts search results.
-     */
     private void sortSearchResults(List<Contact> results) {
         if (results == null || results.isEmpty()) {
             System.out.println(RED + "Nothing to sort." + RESET);
@@ -352,20 +279,6 @@ public class Manager extends Role {
     // HELPER METHODS
     // ==========================================
     
-    /**
-     * Validates if a username is valid.
-     * <p>
-     * Valid username:
-     * <ul>
-     *   <li>Not null or empty</li>
-     *   <li>Length between 1 and MAX_USERNAME_LENGTH</li>
-     *   <li>Contains only letters, numbers, underscores, and dashes</li>
-     * </ul>
-     * </p>
-     * 
-     * @param username the username to validate
-     * @return true if valid, false otherwise
-     */
     private boolean isValidUsername(String username) {
         if (username == null || username.trim().isEmpty()) {
             return false;
@@ -376,20 +289,6 @@ public class Manager extends Role {
         return username.matches("[A-Za-z0-9_-]+");
     }
 
-    /**
-     * Validates if a name is valid (first name or surname).
-     * <p>
-     * Valid name:
-     * <ul>
-     *   <li>Not null or empty</li>
-     *   <li>Length between 1 and MAX_NAME_LENGTH</li>
-     *   <li>Contains only letters (including Turkish), spaces, and apostrophes</li>
-     * </ul>
-     * </p>
-     * 
-     * @param name the name to validate
-     * @return true if valid, false otherwise
-     */
     private boolean isValidUserName(String name) {
         if (name == null || name.trim().isEmpty()) {
             return false;
@@ -400,15 +299,6 @@ public class Manager extends Role {
         return name.matches("[A-Za-zÇçĞğİıÖöŞşÜü' ]+");
     }
 
-    /**
-     * Validates if a role is valid.
-     * <p>
-     * Valid roles: Tester, Junior Developer, Senior Developer, Manager
-     * </p>
-     * 
-     * @param role the role to validate
-     * @return true if valid, false otherwise
-     */
     private boolean isValidRole(String role) {
         if (role == null) {
             return false;
@@ -418,14 +308,7 @@ public class Manager extends Role {
                role.equals("Senior Developer") || 
                role.equals("Manager");
     }
-
-    /**
-     * Sanitizes input to prevent SQL injection.
-     * Removes potentially dangerous characters.
-     * 
-     * @param input the input string to sanitize
-     * @return sanitized string
-     */
+    
     private String sanitizeInput(String input) {
         if (input == null) {
             return "";
@@ -434,12 +317,6 @@ public class Manager extends Role {
         return input.replaceAll("[;'\"\\\\]", "").trim();
     }
 
-    /**
-     * Safe wrapper for reading a line from scanner.
-     * 
-     * @param scanner the scanner to read from
-     * @return trimmed line, or empty string if null/error
-     */
     private String safeReadLine(Scanner scanner) {
         try {
             String line = scanner.nextLine();
@@ -449,11 +326,6 @@ public class Manager extends Role {
         }
     }
 
-    /**
-     * Pauses execution and waits for ENTER.
-     * 
-     * @param scanner the scanner to read from
-     */
     private void pause(Scanner scanner) {
         System.out.println();
         System.out.println("Press ENTER to continue...");
@@ -467,25 +339,7 @@ public class Manager extends Role {
     // OPTION 2: ADVANCED CONTACT STATISTICS (COMPLETELY NEW)
     // ==========================================
     
-    /**
-     * Shows comprehensive contact analytics and statistics.
-     * <p>
-     * Displays advanced analytics including:
-     * <ul>
-     *   <li>Overview statistics</li>
-     *   <li>Geographic distribution (top 5 cities)</li>
-     *   <li>Age demographics (5 age groups)</li>
-     *   <li>Email domain analysis</li>
-     *   <li>Data completeness score</li>
-     *   <li>Birth month distribution</li>
-     *   <li>LinkedIn adoption by age</li>
-     *   <li>Growth trends (last 30 days)</li>
-     * </ul>
-     * </p>
-     */
-    /**
-     * Shows comprehensive contact analytics and statistics.
-     */
+    
     private void showContactsStatisticalInfo() {
         clearScreen();
         System.out.println(CYAN + "╔════════════════════════════════════════════════════════════════╗" + RESET);
@@ -533,9 +387,6 @@ public class Manager extends Role {
         }
     }
 
-    /**
-     * Shows overview statistics.
-     */
     private void showOverviewStatistics(Connection conn) throws SQLException {
         System.out.println(CYAN + "📊 OVERVIEW STATISTICS" + RESET);
         System.out.println("══════════════════════════════════════════════════════════════");
@@ -579,9 +430,7 @@ public class Manager extends Role {
             }
         }
     }
-    /**
-     * 1. Geographic Distribution (Top 5 Cities with ASCII bars)
-     */
+    
    private void showGeographicDistribution(Connection conn) throws SQLException {
         System.out.println(CYAN + "📍 GEOGRAPHIC DISTRIBUTION (TOP 5 CITIES)" + RESET);
         System.out.println("══════════════════════════════════════════════════════════════");
@@ -617,9 +466,6 @@ public class Manager extends Role {
         }
     }
 
-    /**
-     * 2. Age Demographics (Age groups with distribution)
-     */
     private void showAgeDemographics(Connection conn) throws SQLException {
         System.out.println(CYAN + "👥 AGE DEMOGRAPHICS" + RESET);
         System.out.println("══════════════════════════════════════════════════════════════");
@@ -668,9 +514,6 @@ public class Manager extends Role {
         }
     }
 
-    /**
-     * 3. Contact Completeness Score
-     */
     private void showDataCompleteness(Connection conn) throws SQLException {
         System.out.println(CYAN + "📋 CONTACT DATA COMPLETENESS SCORE" + RESET);
         System.out.println("══════════════════════════════════════════════════════════════");
@@ -726,9 +569,7 @@ public class Manager extends Role {
             }
         }
     }
-    /**
-     * 4. Email Domain Analysis
-     */
+    
    private void showEmailDomainAnalysis(Connection conn) throws SQLException {
         System.out.println(CYAN + "📧 TOP EMAIL PROVIDERS" + RESET);
         System.out.println("══════════════════════════════════════════════════════════════");
@@ -770,9 +611,6 @@ public class Manager extends Role {
         }
     }
 
-    /**
-     * 6. Birth Month Distribution
-     */
    private void showBirthMonthDistribution(Connection conn) throws SQLException {
         System.out.println(CYAN + "🎂 BIRTHDAYS BY MONTH" + RESET);
         System.out.println("══════════════════════════════════════════════════════════════");
@@ -826,9 +664,7 @@ public class Manager extends Role {
                              " (" + maxCount + " birthdays)" + RESET);
         }
     }
-    /**
-     * 7. LinkedIn Adoption Rate by Age Group
-     */
+    
    private void showLinkedInAdoptionByAge(Connection conn) throws SQLException {
         System.out.println(CYAN + "💼 LINKEDIN ADOPTION BY AGE GROUP" + RESET);
         System.out.println("══════════════════════════════════════════════════════════════");
@@ -883,9 +719,6 @@ public class Manager extends Role {
         }
     }
 
-    /**
-     * 8. Growth Trends (Last 30 Days)
-     */
    private void showGrowthTrends(Connection conn) throws SQLException {
         System.out.println(CYAN + "📈 RECENT ACTIVITY (LAST 30 DAYS)" + RESET);
         System.out.println("══════════════════════════════════════════════════════════════");
@@ -973,12 +806,6 @@ public class Manager extends Role {
         }
     }
 
-    /**
-     * Calculates age from birth date string.
-     * 
-     * @param birthDate birth date in YYYY-MM-DD format
-     * @return age in years
-     */
     private int calculateAge(String birthDate) {
         try {
             LocalDate birth = LocalDate.parse(birthDate);
@@ -992,19 +819,6 @@ public class Manager extends Role {
     // OPTION 3: LIST ALL USERS
     // ==========================================
     
-    /**
-     * Lists all users in the system with their details.
-     * <p>
-     * Displays user information in a formatted table including:
-     * <ul>
-     *   <li>User ID</li>
-     *   <li>Username</li>
-     *   <li>First Name</li>
-     *   <li>Surname</li>
-     *   <li>Role</li>
-     * </ul>
-     * </p>
-     */
     private void listAllUsers() {
         clearScreen();
         System.out.println(CYAN + "╔════════════════════════════════════════════════╗" + RESET);
@@ -1066,21 +880,6 @@ public class Manager extends Role {
     // OPTION 4: UPDATE EXISTING USER
     // ==========================================
     
-    /**
-     * Updates an existing user's information.
-     * <p>
-     * Allows updating:
-     * <ul>
-     *   <li>Username</li>
-     *   <li>First Name</li>
-     *   <li>Surname</li>
-     *   <li>Role</li>
-     *   <li>Password</li>
-     * </ul>
-     * </p>
-     * 
-     * <p>Uses database transactions to ensure data integrity.</p>
-     */
     private void updateExistingUser() {
         clearScreen();
         System.out.println(CYAN + "╔════════════════════════════════════════════════╗" + RESET);
@@ -1203,9 +1002,6 @@ public class Manager extends Role {
         }
     }
 
-    /**
-     * Updates username for a user.
-     */
     private boolean updateUsername(Connection conn, int userId, String currentUsername) throws SQLException {
         System.out.print(CYAN + "Enter new username: " + RESET);
         String newUsername = sanitizeInput(safeReadLine(sc));
@@ -1235,9 +1031,6 @@ public class Manager extends Role {
         return updateStmt.executeUpdate() > 0;
     }
 
-    /**
-     * Updates first name for a user.
-     */
     private boolean updateFirstName(Connection conn, int userId) throws SQLException {
         System.out.print(CYAN + "Enter new first name: " + RESET);
         String newName = sanitizeInput(safeReadLine(sc));
@@ -1254,9 +1047,6 @@ public class Manager extends Role {
         return updateStmt.executeUpdate() > 0;
     }
 
-    /**
-     * Updates surname for a user.
-     */
     private boolean updateSurname(Connection conn, int userId) throws SQLException {
         System.out.print(CYAN + "Enter new surname: " + RESET);
         String newSurname = sanitizeInput(safeReadLine(sc));
@@ -1273,9 +1063,6 @@ public class Manager extends Role {
         return updateStmt.executeUpdate() > 0;
     }
 
-    /**
-     * Updates role for a user.
-     */
     private boolean updateRole(Connection conn, int userId) throws SQLException {
         System.out.println(CYAN + "Select new role:" + RESET);
         System.out.println("1 - Tester");
@@ -1306,9 +1093,6 @@ public class Manager extends Role {
         return updateStmt.executeUpdate() > 0;
     }
 
-    /**
-     * Updates password for a user.
-     */
     private boolean updatePassword(Connection conn, int userId) throws SQLException {
         System.out.print(CYAN + "Enter new password: " + RESET);
         String newPassword = sc.nextLine();
@@ -1344,21 +1128,6 @@ public class Manager extends Role {
     // OPTION 5: ADD/EMPLOY NEW USER
     // ==========================================
     
-    /**
-     * Adds a new user to the system.
-     * <p>
-     * Collects and validates:
-     * <ul>
-     *   <li>Username (must be unique)</li>
-     *   <li>First Name</li>
-     *   <li>Surname</li>
-     *   <li>Role</li>
-     *   <li>Password (with confirmation)</li>
-     * </ul>
-     * </p>
-     * 
-     * <p>Uses database transactions for data integrity.</p>
-     */
     private void addNewUser() {
         clearScreen();
         System.out.println(CYAN + "╔════════════════════════════════════════════════╗" + RESET);
@@ -1536,18 +1305,6 @@ public class Manager extends Role {
     // OPTION 6: DELETE/FIRE EXISTING USER
     // ==========================================
     
-    /**
-     * Deletes an existing user from the system.
-     * <p>
-     * Security features:
-     * <ul>
-     *   <li>Prevents self-deletion</li>
-     *   <li>Requires "DELETE" confirmation (case-sensitive)</li>
-     *   <li>Displays user info before deletion</li>
-     *   <li>Uses database transactions</li>
-     * </ul>
-     * </p>
-     */
     private void deleteExistingUser() {
         clearScreen();
         System.out.println(RED + "╔════════════════════════════════════════════════╗" + RESET);
@@ -1670,17 +1427,6 @@ public class Manager extends Role {
     // INHERITED METHODS FROM ROLE
     // ==========================================
     
-    /**
-     * Manager-specific contacts menu override.
-     * <p>
-     * NOTE: According to project requirements, Manager should focus on
-     * user management and statistics, not contact CRUD operations.
-     * However, this implementation includes contact viewing for convenience.
-     * </p>
-     * 
-     * <p>To disable contact operations, remove contactsMenu() calls from
-     * showMenu() and this override.</p>
-     */
     @Override
     protected void contactsMenu() {
         // Use inherited contactsMenu from Role
@@ -1706,11 +1452,6 @@ public class Manager extends Role {
     // toString() METHOD
     // ==========================================
     
-    /**
-     * Returns a string representation of this Manager.
-     * 
-     * @return string with manager info
-     */
     @Override
     public String toString() {
         return "Manager{" +
@@ -1720,3 +1461,4 @@ public class Manager extends Role {
                 '}';
     }
 }
+
