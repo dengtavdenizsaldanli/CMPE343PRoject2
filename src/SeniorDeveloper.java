@@ -39,9 +39,6 @@ public class SeniorDeveloper extends JuniorDeveloper {
         }
     }
 
-    /**
-     * Displays Senior Developer menu options.
-     */
     private void displayMenuOptions() {
         System.out.println(GREEN + "[1] - CONTACTS MENU" + RESET);
         System.out.println(GREEN + "[2] - UPDATE CONTACT" + RESET);
@@ -152,7 +149,7 @@ public class SeniorDeveloper extends JuniorDeveloper {
     }
 
     // ==========================================
-    // ADD CONTACT FUNCTIONALITY (NEW!)
+    // ADD CONTACT FUNCTIONALITY
     // ==========================================
 
     private void handleAddContact() {
@@ -509,7 +506,7 @@ public class SeniorDeveloper extends JuniorDeveloper {
     }
 
     // ==========================================
-    // DELETE CONTACT FUNCTIONALITY (NEW!)
+    // DELETE CONTACT FUNCTIONALITY
     // ==========================================
 
     private void handleDeleteContact() {
@@ -996,7 +993,3 @@ public class SeniorDeveloper extends JuniorDeveloper {
     }
 
 }  
-
-
-
-
