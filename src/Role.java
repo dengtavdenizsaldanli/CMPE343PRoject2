@@ -25,47 +25,23 @@ public abstract class Role {
     // ==========================================
     // ANSI COLOR CODES
     // ==========================================
-    
-    /** ANSI reset code. */
     protected static final String RESET = "\u001b[0m";
-    
-    /** ANSI red color. */
     protected static final String RED = "\u001b[31m";
-    
-    /** ANSI blue color. */
     protected static final String BLUE = "\u001b[34m";
-    
-    /** ANSI green color. */
     protected static final String GREEN = "\u001b[32m";
-    
-    /** ANSI cyan color. */
     protected static final String CYAN = "\u001b[36m";
-    
-    /** ANSI purple color. */
     protected static final String PURPLE = "\u001b[35m";
-
     protected static final String YELLOW = "\u001b[33m";
 
     // ==========================================
     // USER IDENTITY FIELDS
     // ==========================================
     
-    /** User's database ID. */
     protected int userId;
-    
-    /** User's username. */
     protected String username;
-    
-    /** User's first name. */
     protected String name;
-    
-    /** User's surname. */
     protected String surname;
-    
-    /** User's role name. */
     protected String role;
-    
-    /** Scanner for user input. */
     protected Scanner sc;
 
     // ==========================================
@@ -88,11 +64,7 @@ public abstract class Role {
     // ==========================================
     // SEARCH ERROR TRACKING
     // ==========================================
-    
-    /** Flag indicating if last search had no results. */
     protected boolean lastSearchHadNoResults;
-    
-    /** Error message from last search. */
     protected String lastSearchErrorMessage;
 
     // ==========================================
@@ -100,7 +72,7 @@ public abstract class Role {
     // ==========================================
     
     public Role(int userId, String username, String name, String surname, String role) {
-        this.sc = Group22.getScanner(); // Use shared scanner
+        this.sc = Group31.getScanner();
         this.lastSearchHadNoResults = false;
         this.lastSearchErrorMessage = null;
         this.userId = userId;
@@ -144,7 +116,6 @@ public abstract class Role {
 public void showUserHeader() {
     System.out.println(CYAN + "╔════════════════════════════════════════════════╗" + RESET);
     
-    // Welcome line
     String welcomeLine = "  Welcome! " + name + " " + surname;
     int welcomePadding = 48 - welcomeLine.length();
     System.out.print(CYAN + "║" + welcomeLine);
@@ -153,7 +124,6 @@ public void showUserHeader() {
     }
     System.out.println("║" + RESET);
     
-    // Role line
     String roleLine = "  Role: " + role;
     int rolePadding = 48 - roleLine.length();
     System.out.print(CYAN + "║" + roleLine);
@@ -178,17 +148,15 @@ public void showUserHeader() {
             System.out.print(CYAN + "Enter Current Password (or type 'cancel' to abort): " + RESET);
             String currentPassword = sc.nextLine().trim();
 
-            // Check for cancel
             if (currentPassword.equalsIgnoreCase("cancel")) {
                 System.out.println(YELLOW + "Password change cancelled." + RESET);
                 return;
             }
 
-            // Check for empty
             if (currentPassword.isEmpty()) {
                 System.out.println(RED + "Password cannot be empty." + RESET);
                 pause();
-                Group22.clearConsole();
+                Group31.clearConsole();
                 continue;
             }
 
@@ -220,12 +188,12 @@ public void showUserHeader() {
                     if (failedAttempts == MAX_ATTEMPTS) {
                         System.out.println(RED + "Too many failed attempts. You have been logged out." + RESET);
                         pause();
-                        Group22.clearConsole();
-                        return; // Exit to main menu
+                        Group31.clearConsole();
+                        return;
                     }
                     
                     pause();
-                    Group22.clearConsole();
+                    Group31.clearConsole();
                     continue;
                 }
 
@@ -233,7 +201,7 @@ public void showUserHeader() {
                 boolean passwordChanged = false;
 
                 while (!passwordChanged) {
-                    Group22.clearConsole();
+                    Group31.clearConsole();
                     
                     // Show requirements based on role
                     displayPasswordRequirements();
@@ -296,7 +264,7 @@ public void showUserHeader() {
                     passwordChanged = true;
                 }
 
-                return; // Exit method after successful change
+                return;
 
             } catch (Exception e) {
                 System.out.println();
@@ -349,12 +317,11 @@ public void showUserHeader() {
             return "Password must contain at least one letter.";
         }
 
-        // Check for invalid characters
         if (!password.matches("[A-Za-zÇçĞğİıÖöŞşÜü0-9!@#$%&*\\-_=+,.<>?~]+")) {
             return "Password contains invalid characters. Only letters, numbers, and these symbols: ! @ # $ % & * - _ = + , . < > ? ~";
         }
 
-        return null; // Valid
+        return null;
     }
     
     private String validateStandardPassword(String password) {
@@ -378,7 +345,7 @@ public void showUserHeader() {
             return "Password cannot match your username.";
         }
 
-        return null; // Valid
+        return null;
     }
 
     protected boolean isValidManagerPassword(String password) {
@@ -393,13 +360,10 @@ public void showUserHeader() {
 
         while (running) {
             clearScreen();
-
-            // Display current list if available
             if (hasEverShownList && !visibleList.isEmpty()) {
                 printVisibleListPaginated();
                 System.out.println();
             } else {
-                // Show helpful message if no list displayed yet
                 if (lastSearchHadNoResults) {
                     System.out.println(RED + lastSearchErrorMessage + RESET);
                     lastSearchHadNoResults = false;
@@ -410,8 +374,7 @@ public void showUserHeader() {
                 System.out.println(CYAN + "Use:" + GREEN + " [1] List All Contacts " + 
                                  CYAN + "or" + GREEN + " [2] Search For Contacts\n" + RESET);
             }
-
-            // Display menu options
+            
             System.out.println(GREEN + "[1] - List All Contacts" + RESET);
             System.out.println(GREEN + "[2] - Search For Contacts" + RESET);
             System.out.println(GREEN + "[3] - Sort Contacts List" + RESET);
@@ -419,8 +382,7 @@ public void showUserHeader() {
             System.out.print("\n" + CYAN + "Pick (1-4) | n = Next | p = Previous | j = Jump: " + RESET);
 
             String choice = sc.nextLine().trim().toLowerCase();
-
-            // Handle navigation commands
+            
             if (choice.equals("n")) {
                 handleNextPage();
                 continue;
@@ -435,8 +397,7 @@ public void showUserHeader() {
                 handleJumpToPage();
                 continue;
             }
-
-            // Handle menu options
+            
             if (!choice.matches("[1-4]")) {
                 System.out.println(RED + "Invalid choice." + RESET);
                 pause();
@@ -467,11 +428,9 @@ public void showUserHeader() {
         currentListTitle = CYAN + "List of All Company Contacts (Unsorted)" + RESET;
         currentPage = 0;
         hasEverShownList = true;
-        
-        // PAUSE to see if list loaded
         System.out.println("Contacts loaded: " + visibleList.size());
         try {
-            Thread.sleep(2000); // 2 saniye bekle
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
@@ -507,24 +466,20 @@ public void showUserHeader() {
             switch (searchChoice) {
                 case "1" -> {
                     boolean singleSearchResult = handleSingleFieldSearch();
-                    // If search was completed successfully, exit to contacts menu
                     if (singleSearchResult) {
                         searchMenuRunning = false;
                     }
-                    // If search was cancelled (returns false), stay in search menu
                 }
                 
                 case "2" -> {
                     boolean multiSearchResult = handleMultiFieldSearch();
-                    // If search was completed successfully, exit to contacts menu
                     if (multiSearchResult) {
                         searchMenuRunning = false;
                     }
-                    // If search was cancelled (returns false), stay in search menu
                 }
                 
                 case "3" -> {
-                    searchMenuRunning = false; // Back to contacts menu
+                    searchMenuRunning = false;
                 }
                 
                 default -> {
@@ -546,8 +501,6 @@ public void showUserHeader() {
         }
 
         if (confirmYesNo("sort the CURRENT visible list")) {
-            
-            // OUTER LOOP - Field selection with retry
             while (true) {
                 clearScreen();
                 printVisibleListPaginated();
@@ -556,17 +509,13 @@ public void showUserHeader() {
                 System.out.println(CYAN + "Sorting list..." + RESET);
                 
                 int field = askSortField();
-                
-                // Check for cancel - return to contacts menu
                 if (field == 0) {
                     System.out.println(YELLOW + "Sort cancelled." + RESET);
                     pause();
-                    return;  // Exit to contacts menu
+                    return;
                 }
                 
                 String fieldName = (field == 1) ? "First Name" : "Last Name";
-                
-                // INNER LOOP - Order selection with retry
                 while (true) {
                     clearScreen();
                     printVisibleListPaginated();
@@ -575,17 +524,13 @@ public void showUserHeader() {
                     System.out.println(CYAN + "Sorting by " + fieldName + "..." + RESET);
                     
                     int order = askSortOrder();
-                    
-                    // Check for cancel - return to FIELD selection
                     if (order == 0) {
                         System.out.println(YELLOW + "Sort order cancelled. Returning to field selection..." + RESET);
                         pause();
-                        break;  // Break inner loop, go back to field selection
+                        break;
                     }
                     
                     String orderName = (order == 1) ? "ASC" : "DESC";
-                    
-                    // Perform sort
                     visibleList.sort((a, b) -> {
                         int cmp = (field == 1) 
                             ? a.getFirstName().compareToIgnoreCase(b.getFirstName())
@@ -601,11 +546,8 @@ public void showUserHeader() {
                     System.out.println(GREEN + "✅ List sorted successfully!" + RESET);
                     pause();
                     
-                    return;  // Exit completely after successful sort
+                    return;
                 }
-                
-                // If we're here, user cancelled order selection
-                // Loop continues to field selection
             }
         }
     }
@@ -717,7 +659,6 @@ public void showUserHeader() {
             System.out.println(CYAN + "Single Field Search" + RESET);
             System.out.println();
 
-            // Field selection loop
             while (true) {
                 System.out.println(GREEN + "[1] - First Name" + RESET);
                 System.out.println(GREEN + "[2] - Middle Name" + RESET);
@@ -728,16 +669,15 @@ public void showUserHeader() {
                 System.out.println(GREEN + "[7] - Birth Year (YYYY)" + RESET);
                 System.out.println(GREEN + "[8] - Birth Month (1-12)" + RESET);
                 System.out.println(GREEN + "[9] - LinkedIn (y/n)" + RESET);
-                System.out.println(RED + "[0] - Back to Search Menu" + RESET);  // ← DEĞİŞTİ
+                System.out.println(RED + "[0] - Back to Search Menu" + RESET);
                 System.out.print("\n" + CYAN + "Pick (0-9): " + RESET);
 
                 String fieldChoice = sc.nextLine().trim();
 
-                // Cancel check
                 if (fieldChoice.equals("0")) {
                     System.out.println(YELLOW + "Search cancelled. Returning to search menu..." + RESET);
                     pause();
-                    return false;  // ← FALSE DÖNDÜR (cancelled)
+                    return false;
                 }
 
                 if (!fieldChoice.matches("[1-9]")) {
@@ -746,37 +686,31 @@ public void showUserHeader() {
                 }
 
                 int fieldNum = Integer.parseInt(fieldChoice);
-
-                // Get search value with validation
                 String searchValue = getSearchValueForField(fieldNum);
                 if (searchValue == null) {
-                    // User cancelled during value entry, return to search menu
-                    return false;  // ← FALSE DÖNDÜR (cancelled)
+                    return false;
                 }
 
-                // Map field number to database column
                 String columnName = mapFieldNumberToColumn(fieldNum);
                 String displayName = getFieldDisplayName(fieldNum);
 
-                // Process special cases for search value
                 String processedValue = processSearchValue(fieldNum, searchValue);
 
-                // Perform search
                 visibleList = searchContacts(columnName, processedValue);
                 currentListTitle = CYAN + "List of Search Results (" + displayName + ")" + RESET;
                 currentPage = 0;
                 hasEverShownList = true;
                 
-                return true;  // ← TRUE DÖNDÜR (completed)
+                return true;
             }
         }
         
-        return false;  // User said no to confirmYesNo
+        return false;
     }
 
     private String getSearchValueForField(int fieldNum) {
         while (true) {
-            Group22.clearConsole();
+            Group31.clearConsole();
             
             if (!visibleList.isEmpty()) {
                 printVisibleListPaginated();
@@ -794,15 +728,13 @@ public void showUserHeader() {
             System.out.print(CYAN + "Enter value (null0=empty, 0=cancel): " + RESET);
             String value = sc.nextLine().trim();
 
-// Check for cancel
             if (value.equals("0")) {
                 System.out.println(YELLOW + "Search cancelled." + RESET);
                 pause();
                 return null;
             }
-            // Check if empty
             if (isBlank(value)) {
-                Group22.clearConsole();
+                Group31.clearConsole();
                 if (!visibleList.isEmpty()) {
                     printVisibleListPaginated();
                     System.out.println();
@@ -812,12 +744,10 @@ public void showUserHeader() {
                 continue;
             }
 
-            // Allow "null0" for searching empty fields
             if (value.equalsIgnoreCase("null0")) {
                 return value;
             }
 
-            // Validate input
             String errorMessage = validateSearchInput(fieldNum, value);
             if (errorMessage != null) {
                 System.out.println(RED + "Invalid input format for this field." + RESET);
@@ -925,7 +855,7 @@ public void showUserHeader() {
             default -> valid = true;
         }
 
-        return null; // Valid
+        return null;
     }
 
     private String mapFieldNumberToColumn(int fieldNum) {
@@ -947,14 +877,12 @@ public void showUserHeader() {
             return value;
         }
 
-        // Birth month: convert to -MM- format for SQL LIKE
         if (fieldNum == 8) {
             int month = Integer.parseInt(value);
             String monthStr = String.format("%02d", month);
             return "-" + monthStr + "-";
         }
 
-        // LinkedIn: convert y/n to yes/no
         if (fieldNum == 9) {
             if (value.equalsIgnoreCase("y")) {
                 return "yes";
@@ -977,7 +905,6 @@ public void showUserHeader() {
 
         value = value.trim();
 
-        // Build SQL query
         String sql;
         if (value.equalsIgnoreCase("null0")) {
             sql = "SELECT * FROM contacts WHERE " + column + " IS NULL OR " + column + " = ''";
@@ -992,7 +919,6 @@ public void showUserHeader() {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            // Set parameter if using LIKE
             if (!value.equalsIgnoreCase("null0") && 
                 !(column.equals("linkedin_url") && 
                   (value.equalsIgnoreCase("yes") || value.equalsIgnoreCase("no")))) {
@@ -1042,11 +968,10 @@ public void showUserHeader() {
 
         String input = sc.nextLine().trim();
 
-        // Check for cancel
         if (input.equals("0")) {
             System.out.println(YELLOW + "Search cancelled. Returning to search menu..." + RESET);
             pause();
-            return false;  // ← FALSE DÖNDÜR (cancelled)
+            return false;
         }
 
         int numFields;
@@ -1058,36 +983,31 @@ public void showUserHeader() {
         } catch (Exception e) {
             System.out.println(RED + "You must select between 2 and 4 fields." + RESET);
             pause();
-            return false;  // ← FALSE DÖNDÜR (invalid)
+            return false;
         }
 
         String[] selectedFields = new String[numFields];
         String[] searchValues = new String[numFields];
 
-        // Get field selections and values
         for (int i = 0; i < numFields; i++) {
-            // Field selection
             String field = selectMultiFieldOption(i + 1, selectedFields, i);
             if (field == null) {
-                return false; // ← FALSE DÖNDÜR (cancelled)
+                return false;
             }
             selectedFields[i] = field;
 
-            // Value input
             String value = getMultiFieldValue(field);
             if (value == null) {
-                return false; // ← FALSE DÖNDÜR (cancelled)
+                return false;
             }
             searchValues[i] = value;
         }
-
-        // Perform multi-field search
         visibleList = multiFieldSearch(selectedFields, searchValues);
         currentListTitle = CYAN + "Multi-Field Search Results" + RESET;
         currentPage = 0;
         hasEverShownList = true;
         
-        return true;  // ← TRUE DÖNDÜR (completed)
+        return true;
     }
 
     private String selectMultiFieldOption(int fieldNumber, String[] alreadySelected, int currentIndex) {
@@ -1101,37 +1021,34 @@ public void showUserHeader() {
 
             System.out.println(CYAN + "Choose field #" + fieldNumber + RESET);
 
-// Display all available fields
-for (int i = 0; i < MULTI_FIELDS.length; i++) {
-    System.out.println(GREEN + "[" + (i + 1) + "] - " + MULTI_FIELDS[i][1] + RESET);
-}
-System.out.println(RED + "[0] - Cancel" + RESET);  // ← YENİ!
-
-System.out.print(CYAN + "Pick field (0 to cancel): " + RESET);  // ← Güncellendi
-            int choice;
-try {
-    choice = Integer.parseInt(sc.nextLine().trim());
-    
-    // Cancel check
-    if (choice == 0) {
-        System.out.println(YELLOW + "Search cancelled." + RESET);
-        pause();
-        return null;
-    }
-    
-    choice--; // Convert to 0-based index
-    if (choice < 0 || choice >= MULTI_FIELDS.length) {
-        throw new Exception();
-    }
-} catch (Exception e) {
-    System.out.println(RED + "Invalid field selection." + RESET);
-    pause();
-    continue;
-}
+            for (int i = 0; i < MULTI_FIELDS.length; i++) {
+                System.out.println(GREEN + "[" + (i + 1) + "] - " + MULTI_FIELDS[i][1] + RESET);
+            }
+            System.out.println(RED + "[0] - Cancel" + RESET);
+            
+            System.out.print(CYAN + "Pick field (0 to cancel): " + RESET);
+                        int choice;
+            try {
+                choice = Integer.parseInt(sc.nextLine().trim());
+                
+                if (choice == 0) {
+                    System.out.println(YELLOW + "Search cancelled." + RESET);
+                    pause();
+                    return null;
+                }
+                
+                choice--;
+                if (choice < 0 || choice >= MULTI_FIELDS.length) {
+                    throw new Exception();
+                }
+            } catch (Exception e) {
+                System.out.println(RED + "Invalid field selection." + RESET);
+                pause();
+                continue;
+            }
 
             String selectedField = MULTI_FIELDS[choice][0];
 
-            // Check if already selected
             boolean duplicate = false;
             for (int j = 0; j < currentIndex; j++) {
                 if (alreadySelected[j].equals(selectedField)) {
@@ -1152,7 +1069,7 @@ try {
 
     private String getMultiFieldValue(String fieldName) {
         while (true) {
-            Group22.clearConsole();
+            Group31.clearConsole();
             
             if (!visibleList.isEmpty()) {
                 printVisibleListPaginated();
@@ -1162,22 +1079,18 @@ try {
             String displayName = getDisplayNameForColumn(fieldName);
             System.out.println(CYAN + "Enter value for: " + displayName + RESET);
             
-            // Show field-specific guide
             displayMultiFieldGuide(fieldName);
 
-            System.out.print(CYAN + "Enter value (0=cancel, null0=empty): " + RESET);  // ← DEĞİŞTİ
+            System.out.print(CYAN + "Enter value (0=cancel, null0=empty): " + RESET);
             String value = sc.nextLine().trim();
 
-            // Check for cancel - YENİ BLOK BAŞLANGIÇ
             if (value.equals("0") || value.equalsIgnoreCase("cancel")) {
                 System.out.println(YELLOW + "Search cancelled." + RESET);
                 pause();
                 return null;
             }
-            // YENİ BLOK BİTİŞ
-
             if (isBlank(value)) {
-                Group22.clearConsole();
+                Group31.clearConsole();
                 if (!visibleList.isEmpty()) {
                     printVisibleListPaginated();
                     System.out.println();
@@ -1191,7 +1104,6 @@ try {
                 return value;
             }
 
-            // Validate input
             boolean valid = validateMultiFieldInput(fieldName, value);
             if (valid) {
                 return value;
@@ -1287,10 +1199,8 @@ try {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
 
-            // Set parameters
             int paramIndex = 1;
             for (int i = 0; i < values.length; i++) {
-                // Process special values
                 String processedValue = values[i];
                 
                 if (processedValue.equalsIgnoreCase("y")) {
@@ -1299,7 +1209,6 @@ try {
                     processedValue = "NO_LINKEDIN";
                 }
 
-                // Only set parameter if using LIKE
                 if (!processedValue.equalsIgnoreCase("null0") && 
                     !processedValue.equals("HAS_LINKEDIN") && 
                     !processedValue.equals("NO_LINKEDIN")) {
@@ -1380,13 +1289,13 @@ try {
         while (true) {
             System.out.println(GREEN + "[1] - First Name" + RESET);
             System.out.println(GREEN + "[2] - Last Name" + RESET);
-            System.out.println(RED + "[0] - Cancel" + RESET);  // ← YENİ!
-            System.out.print("\n" + CYAN + "Pick an Option (0-2): " + RESET);  // ← 0-2 oldu
+            System.out.println(RED + "[0] - Cancel" + RESET);
+            System.out.print("\n" + CYAN + "Pick an Option (0-2): " + RESET);
             
             String choice = sc.nextLine().trim();
             
-            if (choice.equals("0")) {  // ← YENİ!
-                return 0;  // Cancel
+            if (choice.equals("0")) {
+                return 0;
             }
             
             if (choice.matches("[1-2]")) {
@@ -1400,13 +1309,13 @@ try {
     protected int askSortOrder() {
         while (true) {
             System.out.println(GREEN + "1 - ASC | 2 - DESC" + RESET);
-            System.out.println(RED + "0 - Cancel" + RESET);  // ← YENİ!
-            System.out.print("\n" + CYAN + "Pick an Option (0-2): " + RESET);  // ← 0-2 oldu
+            System.out.println(RED + "0 - Cancel" + RESET);
+            System.out.print("\n" + CYAN + "Pick an Option (0-2): " + RESET);
             
             String choice = sc.nextLine().trim();
             
-            if (choice.equals("0")) {  // ← YENİ!
-                return 0;  // Cancel
+            if (choice.equals("0")) {
+                return 0;
             }
             
             if (choice.matches("[1-2]")) {
@@ -1472,7 +1381,6 @@ try {
                 System.out.flush();
             }
         } catch (Exception e) {
-            // Console clearing failed - ignore
         }
     }
 
@@ -1499,7 +1407,6 @@ try {
         try {
             sc.nextLine();
         } catch (Exception e) {
-            // Ignore input errors
         }
     }
     
@@ -1512,16 +1419,8 @@ try {
         }
     }
 
-    // ==========================================
-    // ABSTRACT METHOD (must be implemented by subclasses)
-    // ==========================================
-    
     public abstract void showMenu();
 
-    // ==========================================
-    // toString() METHOD
-    // ==========================================
-    
     @Override
     public String toString() {
         return "Role{" +
@@ -1532,4 +1431,3 @@ try {
                 '}';
     }
 }
-
