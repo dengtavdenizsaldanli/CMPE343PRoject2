@@ -889,6 +889,7 @@ public class SeniorDeveloper extends JuniorDeveloper {
         pause();
     }
 
+
 @Override
     public String toString() {
         return "SeniorDeveloper{" +
@@ -898,6 +899,121 @@ public class SeniorDeveloper extends JuniorDeveloper {
                 ", undoStackSize=" + undoStack.size() +
                 '}';
     }
-}
+
+    // ==========================================
+    // UPDATE OPERATION CLASS
+    // ==========================================
+
+    /**
+     * Represents an update operation for undo functionality.
+     */
+    private class UpdateOperation extends ContactOperation {
+        private final Contact oldContact;
+        private final Contact newContact;
+
+        public UpdateOperation(Contact oldContact, Contact newContact) {
+            this.oldContact = oldContact;
+            this.newContact = newContact;
+        }
+
+        @Override
+        boolean revert() {
+            // Restore old values
+            String sql = "UPDATE contacts SET " +
+                       "first_name = ?, middle_name = ?, last_name = ?, nickname = ?, " +
+                       "city = ?, phone_primary = ?, phone_secondary = ?, " +
+                       "email = ?, linkedin_url = ?, birth_date = ? " +
+                       "WHERE contact_id = ?";
+
+            try (Connection conn = DatabaseConnection.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+                stmt.setString(1, oldContact.getFirstName());
+                stmt.setString(2, oldContact.getMiddleName());
+                stmt.setString(3, oldContact.getLastName());
+                stmt.setString(4, oldContact.getNickname());
+                stmt.setString(5, oldContact.getCity());
+                stmt.setString(6, oldContact.getPhonePrimary());
+                stmt.setString(7, oldContact.getPhoneSecondary());
+                stmt.setString(8, oldContact.getEmail());
+                stmt.setString(9, oldContact.getLinkedinUrl());
+                stmt.setString(10, oldContact.getBirthDateString());
+                stmt.setInt(11, oldContact.getId());
+
+                return stmt.executeUpdate() > 0;
+
+            } catch (SQLException e) {
+                System.err.println(RED + "Failed to undo update: " + e.getMessage() + RESET);
+                return false;
+            }
+        }
+
+        @Override
+        String getDescription() {
+            return "UPDATE Contact (ID: " + oldContact.getId() + ", Name: " + 
+                   oldContact.getFirstName() + " " + oldContact.getLastName() + ")";
+        }
+    }
+
+    // ==========================================
+    // UPDATE UNDO HELPER METHODS
+    // ==========================================
+
+    /**
+     * Adds an update operation to undo stack.
+     * Called from JuniorDeveloper when update is performed.
+     * 
+     * @param oldContact Contact state before update
+     * @param newContact Contact state after update
+     */
+    protected void addUpdateToUndoStack(Contact oldContact, Contact newContact) {
+        addToUndoStack(new UpdateOperation(oldContact, newContact));
+    }
+
+    /**
+     * Asks user if they want to undo the last operation immediately.
+     * Only available for Senior Developers.
+     */
+    private void askForImmediateUndo() {
+        if (undoStack.isEmpty()) {
+            return; // Nothing to undo
+        }
+
+        System.out.println();
+        System.out.println(PURPLE + "═══════════════════════════════════════════════" + RESET);
+        System.out.print(PURPLE + "Do you want to UNDO this operation? (" + 
+                        GREEN + "y" + PURPLE + "/" + RED + "n" + PURPLE + "): " + RESET);
+        
+        String response = sc.nextLine().trim();
+
+        if (response.equalsIgnoreCase("y")) {
+            ContactOperation lastOp = undoStack.pop();
+            System.out.println();
+            System.out.println(CYAN + "Undoing: " + lastOp.getDescription() + RESET);
+            
+            boolean success = lastOp.revert();
+
+            if (success) {
+                System.out.println(GREEN + "✅ Operation undone successfully!" + RESET);
+            } else {
+                System.out.println(RED + "❌ Undo failed." + RESET);
+            }
+            
+            pause();
+        } else {
+            System.out.println(YELLOW + "Operation kept. You can undo later from main menu." + RESET);
+        }
+    }
+
+    /**
+     * Public wrapper for askForImmediateUndo.
+     * Called from JuniorDeveloper when SeniorDeveloper updates a contact.
+     */
+    public void askForImmediateUndoPublic() {
+        askForImmediateUndo();
+    }
+
+}  
+
 
 
