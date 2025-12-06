@@ -104,7 +104,7 @@ public class SeniorDeveloper extends JuniorDeveloper {
     public void showMenu() {
         boolean running = true;
 
-        while (running) {
+        while (running) { 
             try {
                 clearScreen();
                 showUserHeader();
@@ -1071,3 +1071,4 @@ public class SeniorDeveloper extends JuniorDeveloper {
                 '}';
     }
 }
+
