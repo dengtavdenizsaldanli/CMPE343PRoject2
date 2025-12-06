@@ -142,6 +142,9 @@ public class Tester extends Role {
                 ", name='" + name + " " + surname + '\'' +
                 '}';
     }
+}
+
+
 
 
 
