@@ -34,7 +34,7 @@ public class JuniorDeveloper extends Role {
 
     private void displayMenuOptions() {
         System.out.println(GREEN + "[1] - CONTACTS MENU" + RESET);
-        System.out.println(GREEN + "[2] - UPDATE CONTACT" + RESET);  // NEW!
+        System.out.println(GREEN + "[2] - UPDATE CONTACT" + RESET);
         System.out.println(GREEN + "[3] - CHANGE PASSWORD" + RESET);
         System.out.println("\n" + RED + "[4] - LOGOUT" + RESET);
         System.out.print("\n" + CYAN + "Pick an Option (1-4): " + RESET);
@@ -61,7 +61,7 @@ public class JuniorDeveloper extends Role {
             }
 
             case "2" -> {
-                handleUpdateContact();  // NEW!
+                handleUpdateContact();
                 return true;
             }
 
@@ -134,13 +134,11 @@ public class JuniorDeveloper extends Role {
         System.out.println();
 
         try {
-            // Step 1: Get contact ID
             int contactId = getContactIdFromUser();
             if (contactId == -1) {
-                return; // User cancelled
+                return;
             }
 
-            // Step 2: Fetch OLD contact (BEFORE update) for undo
             Contact oldContact = fetchContactById(contactId);
             if (oldContact == null) {
                 System.out.println(RED + "Contact with ID " + contactId + " not found!" + RESET);
@@ -148,37 +146,28 @@ public class JuniorDeveloper extends Role {
                 return;
             }
 
-            // Step 3: Display current contact
             displayContactInfo(oldContact);
 
-            // Step 4: Select field to update
             String field = selectFieldToUpdate();
             if (field == null) {
-                return; // User cancelled
+                return;
             }
 
-            // Step 5: Get new value
             String newValue = getNewValueForField(field);
             if (newValue == null) {
-                return; // User cancelled
+                return;
             }
 
-            // Step 6: Update database
             boolean success = updateContactInDatabase(contactId, field, newValue);
 
-            // Step 7: Display result
             if (success) {
                 System.out.println();
                 System.out.println(GREEN + "✅ Contact updated successfully!" + RESET);
-                
-                // Fetch NEW contact (AFTER update) for undo
+
                 Contact newContact = fetchContactById(contactId);
                 
-                // Add to undo stack (only if user is SeniorDeveloper)
                 if (this instanceof SeniorDeveloper && newContact != null) {
                     ((SeniorDeveloper) this).addUpdateToUndoStack(oldContact, newContact);
-                    
-                    // Ask for immediate undo (SeniorDeveloper only)
                     ((SeniorDeveloper) this).askForImmediateUndoPublic();
                 }
                 
@@ -306,7 +295,6 @@ public class JuniorDeveloper extends Role {
         System.out.println();
         System.out.println(CYAN + "Enter new value for " + getFieldDisplayName(field) + ":" + RESET);
         
-        // Show validation rules
         displayValidationRules(field);
 
         System.out.print(CYAN + "New value (or 'cancel' to abort): " + RESET);
@@ -318,7 +306,6 @@ public class JuniorDeveloper extends Role {
             return null;
         }
 
-        // Validate input
         if (!validateFieldValue(field, value)) {
             System.out.println(RED + "Invalid value for this field!" + RESET);
             pause();
@@ -364,7 +351,6 @@ public class JuniorDeveloper extends Role {
     }
 
     private boolean validateFieldValue(String field, String value) {
-        // Allow empty for optional fields
         if (value.isEmpty()) {
             return field.equals("middle_name") || field.equals("nickname") || 
                    field.equals("city") || field.equals("phone_secondary") || 
@@ -383,7 +369,7 @@ public class JuniorDeveloper extends Role {
             case "birth_date" -> 
                 Contact.isValidBirthDate(value);
             case "linkedin_url" -> 
-                true; // No strict validation for URL
+                true;
             default -> false;
         };
     }
@@ -394,7 +380,6 @@ public class JuniorDeveloper extends Role {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            // Handle empty values (set to NULL)
             if (newValue.isEmpty()) {
                 stmt.setNull(1, Types.VARCHAR);
             } else {
@@ -431,6 +416,4 @@ public class JuniorDeveloper extends Role {
                 ", name='" + name + " " + surname + '\'' +
                 '}';
     }
-
 }
-
