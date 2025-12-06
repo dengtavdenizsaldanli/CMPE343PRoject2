@@ -42,9 +42,9 @@ public class SeniorDeveloper extends JuniorDeveloper {
     private void displayMenuOptions() {
         System.out.println(GREEN + "[1] - CONTACTS MENU" + RESET);
         System.out.println(GREEN + "[2] - UPDATE CONTACT" + RESET);
-        System.out.println(GREEN + "[3] - ADD CONTACT(S)" + RESET);  // NEW!
-        System.out.println(GREEN + "[4] - DELETE CONTACT(S)" + RESET);  // NEW!
-        System.out.println(PURPLE + "[5] - UNDO LAST OPERATION" + RESET);  // NEW!
+        System.out.println(GREEN + "[3] - ADD CONTACT(S)" + RESET);
+        System.out.println(GREEN + "[4] - DELETE CONTACT(S)" + RESET);
+        System.out.println(PURPLE + "[5] - UNDO LAST OPERATION" + RESET);
         System.out.println(GREEN + "[6] - CHANGE PASSWORD" + RESET);
         System.out.println("\n" + RED + "[7] - LOGOUT" + RESET);
         System.out.print("\n" + CYAN + "Pick an Option (1-7): " + RESET);
@@ -1000,4 +1000,5 @@ public class SeniorDeveloper extends JuniorDeveloper {
     }
 
 }  
+
 
