@@ -904,9 +904,6 @@ public class SeniorDeveloper extends JuniorDeveloper {
     // UPDATE OPERATION CLASS
     // ==========================================
 
-    /**
-     * Represents an update operation for undo functionality.
-     */
     private class UpdateOperation extends ContactOperation {
         private final Contact oldContact;
         private final Contact newContact;
@@ -959,21 +956,10 @@ public class SeniorDeveloper extends JuniorDeveloper {
     // UPDATE UNDO HELPER METHODS
     // ==========================================
 
-    /**
-     * Adds an update operation to undo stack.
-     * Called from JuniorDeveloper when update is performed.
-     * 
-     * @param oldContact Contact state before update
-     * @param newContact Contact state after update
-     */
     protected void addUpdateToUndoStack(Contact oldContact, Contact newContact) {
         addToUndoStack(new UpdateOperation(oldContact, newContact));
     }
 
-    /**
-     * Asks user if they want to undo the last operation immediately.
-     * Only available for Senior Developers.
-     */
     private void askForImmediateUndo() {
         if (undoStack.isEmpty()) {
             return; // Nothing to undo
@@ -1005,15 +991,12 @@ public class SeniorDeveloper extends JuniorDeveloper {
         }
     }
 
-    /**
-     * Public wrapper for askForImmediateUndo.
-     * Called from JuniorDeveloper when SeniorDeveloper updates a contact.
-     */
     public void askForImmediateUndoPublic() {
         askForImmediateUndo();
     }
 
 }  
+
 
 
 
