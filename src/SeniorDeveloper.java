@@ -171,16 +171,13 @@ public class SeniorDeveloper extends JuniorDeveloper {
             switch (choice) {
                 case "1" -> {
                     boolean result = addSingleContact();
-                    // If contact added successfully, return to main menu
                     if (result) {
                         addMenuRunning = false;
                     }
-                    // If cancelled, stay in add menu
                 }
                 
                 case "2" -> {
                     addMultipleContacts();
-                    // After batch operation, return to main menu
                     addMenuRunning = false;
                 }
                 
@@ -204,7 +201,6 @@ public class SeniorDeveloper extends JuniorDeveloper {
         System.out.println();
 
         try {
-            // Required fields
             String firstName = getRequiredInput("First Name", Contact::isValidName,
                 "Letters, spaces, apostrophes, Turkish characters only");
             if (firstName == null) {
@@ -237,7 +233,6 @@ public class SeniorDeveloper extends JuniorDeveloper {
                 return false;
             }
 
-            // Optional fields
             String middleName = getOptionalInput("Middle Name", Contact::isValidName);
             if (middleName == null) {
                 System.out.println(YELLOW + "Add contact cancelled." + RESET);
@@ -384,11 +379,6 @@ public class SeniorDeveloper extends JuniorDeveloper {
         pause();
     }
     
-   /**
-     * Gets required input with validation.
-     * 
-     * @return input string if valid, null if cancelled
-     */
     private String getRequiredInput(String fieldName, java.util.function.Predicate<String> validator, String rules) {
         while (true) {
             System.out.println(BLUE + fieldName + " (Required - 0 to cancel):" + RESET);
@@ -396,9 +386,8 @@ public class SeniorDeveloper extends JuniorDeveloper {
             System.out.print("  Value: ");
             String value = sc.nextLine().trim();
 
-            // Check for cancel
             if (value.equals("0") || value.equalsIgnoreCase("cancel")) {
-                return null;  // Signal cancellation
+                return null;
             }
 
             if (value.isEmpty()) {
@@ -414,31 +403,24 @@ public class SeniorDeveloper extends JuniorDeveloper {
         }
     }
 
-    /**
-     * Gets optional input with validation.
-     * 
-     * @return input string if valid, empty string if skipped, null if cancelled
-     */
     private String getOptionalInput(String fieldName, java.util.function.Predicate<String> validator) {
-        while (true) {  // ← DÖNGÜ EKLENDİ!
+        while (true) {
             System.out.println(BLUE + fieldName + " (Optional - press ENTER to skip, 0 to cancel):" + RESET);
             System.out.print("  Value: ");
             String value = sc.nextLine().trim();
 
-            // Check for cancel
             if (value.equals("0") || value.equalsIgnoreCase("cancel")) {
-                return null;  // Signal cancellation
+                return null;
             }
 
             if (value.isEmpty()) {
-                return "";  // Return empty string for optional skip
+                return "";
             }
 
             if (validator.test(value)) {
-                return value;  // Valid input
+                return value;
             } else {
                 System.out.println(RED + "Invalid format! Please try again." + RESET);  
-                // Döngü devam eder, tekrar sor
             }
         }
     }
@@ -537,16 +519,13 @@ public class SeniorDeveloper extends JuniorDeveloper {
             switch (choice) {
                 case "1" -> {
                     boolean result = deleteSingleContact();
-                    // If contact deleted successfully, return to main menu
                     if (result) {
                         deleteMenuRunning = false;
                     }
-                    // If cancelled, stay in delete menu
                 }
                 
                 case "2" -> {
                     deleteMultipleContacts();
-                    // After batch operation, return to main menu
                     deleteMenuRunning = false;
                 }
                 
@@ -623,7 +602,7 @@ public class SeniorDeveloper extends JuniorDeveloper {
             addToUndoStack(new DeleteOperation(contact));
             
             pause();
-            return true;  // Successfully deleted
+            return true;
         } else {
             System.out.println();
             System.out.println(RED + "❌ Failed to delete contact." + RESET);
@@ -643,13 +622,13 @@ public class SeniorDeveloper extends JuniorDeveloper {
         if (input.equals("0")) {
             System.out.println(YELLOW + "Multiple delete cancelled." + RESET);
             pause();
-            return;  // Return to delete menu
+            return;
         }
 
         if (input.isEmpty()) {
             System.out.println(YELLOW + "No IDs provided." + RESET);
             pause();
-            return;  // Return to delete menu
+            return;
         }
 
         String[] idStrings = input.split(",");
@@ -666,7 +645,7 @@ public class SeniorDeveloper extends JuniorDeveloper {
         if (ids.isEmpty()) {
             System.out.println(RED + "No valid IDs." + RESET);
             pause();
-            return;  // Return to delete menu
+            return;
         }
 
         // Show contacts to be deleted
@@ -694,7 +673,7 @@ public class SeniorDeveloper extends JuniorDeveloper {
         if (contactsToDelete.isEmpty()) {
             System.out.println(RED + "No valid contacts found to delete." + RESET);
             pause();
-            return;  // Return to delete menu
+            return;
         }
         
         System.out.println(RED + "════════════════════════════════════════════════" + RESET);
@@ -707,16 +686,15 @@ public class SeniorDeveloper extends JuniorDeveloper {
         if (confirm.equals("0")) {
             System.out.println(YELLOW + "Deletion cancelled." + RESET);
             pause();
-            return;  // Return to delete menu
+            return;
         }
 
         if (!confirm.equals("DELETE")) {
             System.out.println(YELLOW + "Deletion cancelled. You must type 'DELETE' exactly." + RESET);
             pause();
-            return;  // Return to delete menu
+            return;
         }
 
-        // If we reach here, user confirmed - proceed with deletion
         int deletedCount = 0;
         int failedCount = 0;
         
@@ -740,9 +718,7 @@ public class SeniorDeveloper extends JuniorDeveloper {
         }
         System.out.println();
         pause();
-        
-        // Note: Method returns here after success
-        // handleDeleteContact() will exit loop and go to main menu
+
     }
    
     private boolean deleteContactFromDatabase(int contactId) {
@@ -848,7 +824,6 @@ public class SeniorDeveloper extends JuniorDeveloper {
 
         @Override
         boolean revert() {
-            // Re-insert with same ID
             String sql = "INSERT INTO contacts (contact_id, first_name, middle_name, last_name, " +
                         "nickname, city, phone_primary, phone_secondary, email, linkedin_url, birth_date) " +
                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -919,7 +894,6 @@ public class SeniorDeveloper extends JuniorDeveloper {
 
         @Override
         boolean revert() {
-            // Restore old values
             String sql = "UPDATE contacts SET " +
                        "first_name = ?, middle_name = ?, last_name = ?, nickname = ?, " +
                        "city = ?, phone_primary = ?, phone_secondary = ?, " +
@@ -966,7 +940,7 @@ public class SeniorDeveloper extends JuniorDeveloper {
 
     private void askForImmediateUndo() {
         if (undoStack.isEmpty()) {
-            return; // Nothing to undo
+            return;
         }
 
         System.out.println();
@@ -1000,5 +974,6 @@ public class SeniorDeveloper extends JuniorDeveloper {
     }
 
 }  
+
 
 
