@@ -1,95 +1,12 @@
 import java.sql.*;
 import java.util.Scanner;
 
-/**
- * JuniorDeveloper role class with contact viewing and update permissions.
- * <p>
- * JuniorDeveloper extends Tester capabilities by adding the ability to
- * update existing contact information. This role is suitable for users
- * who need to maintain and correct contact data but should not have
- * full CRUD permissions.
- * </p>
- * 
- * <p><b>Permissions:</b></p>
- * <ul>
- *   <li>✅ List all contacts (inherited from Tester)</li>
- *   <li>✅ Search contacts by single/multiple fields (inherited)</li>
- *   <li>✅ Sort contacts (inherited)</li>
- *   <li>✅ <b>Update existing contacts</b> (NEW - Junior Developer only)</li>
- *   <li>✅ Change own password (inherited)</li>
- *   <li>✅ Logout (inherited)</li>
- *   <li>❌ Add new contacts (not allowed - requires Senior Developer)</li>
- *   <li>❌ Delete contacts (not allowed - requires Senior Developer)</li>
- *   <li>❌ User management (not allowed - requires Manager)</li>
- * </ul>
- * 
- * <p><b>Update Operations:</b></p>
- * <ul>
- *   <li>Update any field: name, phone, email, city, LinkedIn, birth date</li>
- *   <li>All updates are validated before saving</li>
- *   <li>Validation rules match those defined in Contact class</li>
- *   <li>Failed validations show clear error messages</li>
- * </ul>
- * 
- * <p><b>Typical Use Case:</b></p>
- * <p>
- * Junior developers maintain contact data quality by correcting typos,
- * updating phone numbers, adding missing information, etc.
- * </p>
- * 
- * @author Group 22
- * @version 1.0
- * @since 2024
- * @see Tester
- * @see SeniorDeveloper
- * @see Contact
- */
 public class JuniorDeveloper extends Role {
 
-    /**
-     * Constructs a JuniorDeveloper role with specified user credentials.
-     * <p>
-     * This constructor initializes the Junior Developer role by calling
-     * the parent Role constructor with the role name "Junior Developer".
-     * </p>
-     * 
-     * @param id user ID from database (unique identifier)
-     * @param u username for authentication
-     * @param n first name of the user
-     * @param s surname (last name) of the user
-     */
     public JuniorDeveloper(int id, String u, String n, String s) {
         super(id, u, n, s, "Junior Developer");
     }
 
-    /**
-     * Displays and manages the Junior Developer role menu.
-     * <p>
-     * This method presents a console-based menu with options specific to
-     * the Junior Developer role, including the ability to update contacts.
-     * The menu runs in a loop until the user chooses to logout.
-     * </p>
-     * 
-     * <p><b>Menu Options:</b></p>
-     * <ol>
-     *   <li><b>Contacts Menu:</b> View, search, and sort contacts</li>
-     *   <li><b>Update Contact:</b> Modify existing contact information (NEW)</li>
-     *   <li><b>Change Password:</b> Update own password</li>
-     *   <li><b>Logout:</b> Exit to main menu</li>
-     * </ol>
-     * 
-     * <p><b>Input Validation:</b></p>
-     * <ul>
-     *   <li>Only accepts inputs "1", "2", "3", or "4"</li>
-     *   <li>Invalid inputs display error and re-prompt</li>
-     * </ul>
-     * 
-     * <p><b>Exception Safety:</b></p>
-     * <p>
-     * All operations are exception-safe and will not crash the application.
-     * </p>
-     */
-    @Override
     public void showMenu() {
         boolean running = true;
 
@@ -115,9 +32,6 @@ public class JuniorDeveloper extends Role {
         }
     }
 
-    /**
-     * Displays the menu options for Junior Developer role.
-     */
     private void displayMenuOptions() {
         System.out.println(GREEN + "[1] - CONTACTS MENU" + RESET);
         System.out.println(GREEN + "[2] - UPDATE CONTACT" + RESET);  // NEW!
@@ -126,31 +40,19 @@ public class JuniorDeveloper extends Role {
         System.out.print("\n" + CYAN + "Pick an Option (1-4): " + RESET);
     }
 
-    /**
-     * Reads user input.
-     */
     private String getUserChoice() {
         return sc.nextLine().trim();
     }
 
-    /**
-     * Validates menu choice (1-4).
-     */
     private boolean isValidChoice(String choice) {
         return choice.matches("[1-4]");
     }
 
-    /**
-     * Handles invalid choices.
-     */
     private void handleInvalidChoice() {
         System.out.println(RED + "Invalid choice. Please enter 1, 2, 3, or 4." + RESET);
         pause();
     }
 
-    /**
-     * Processes the user's menu choice.
-     */
     private boolean processMenuChoice(String choice) {
         switch (choice) {
             case "1" -> {
@@ -178,9 +80,6 @@ public class JuniorDeveloper extends Role {
         }
     }
 
-    /**
-     * Handles contacts menu.
-     */
     private void handleContactsMenu() {
         try {
             contactsMenu();
@@ -190,9 +89,6 @@ public class JuniorDeveloper extends Role {
         }
     }
 
-    /**
-     * Handles change password.
-     */
     private void handleChangePassword() {
         try {
             clearScreen();
@@ -204,9 +100,6 @@ public class JuniorDeveloper extends Role {
         }
     }
 
-    /**
-     * Handles logout with confirmation.
-     */
     private boolean handleLogout() {
         System.out.print(
             CYAN + "Are you sure you want to logout (" +
@@ -233,24 +126,6 @@ public class JuniorDeveloper extends Role {
     // UPDATE CONTACT FUNCTIONALITY (NEW!)
     // ==========================================
 
-    /**
-     * Handles the Update Contact operation.
-     * <p>
-     * This is the main entry point for updating existing contacts.
-     * The process includes:
-     * <ol>
-     *   <li>User enters contact ID to update</li>
-     *   <li>System fetches and displays current contact information</li>
-     *   <li>User selects which field to update</li>
-     *   <li>User enters new value (with validation)</li>
-     *   <li>System updates the database</li>
-     *   <li>Success/failure message displayed</li>
-     * </ol>
-     * </p>
-     * 
-     * <p><b>Exception Safety:</b> All database and validation errors
-     * are caught and displayed to the user.</p>
-     */
     protected void handleUpdateContact() {
         clearScreen();
         System.out.println(CYAN + "╔════════════════════════════════════════════════╗" + RESET);
@@ -308,11 +183,6 @@ public class JuniorDeveloper extends Role {
         pause();
     }
 
-    /**
-     * Gets contact ID from user input.
-     * 
-     * @return contact ID, or -1 if cancelled/invalid
-     */
     private int getContactIdFromUser() {
         System.out.print(CYAN + "Enter Contact ID to update (or 0 to cancel): " + RESET);
         String input = sc.nextLine().trim();
@@ -338,12 +208,6 @@ public class JuniorDeveloper extends Role {
         }
     }
 
-    /**
-     * Fetches a contact from the database by ID.
-     * 
-     * @param contactId the contact ID to fetch
-     * @return Contact object if found, null otherwise
-     */
     private Contact fetchContactById(int contactId) {
         String sql = "SELECT * FROM contacts WHERE contact_id = ?";
 
@@ -375,9 +239,6 @@ public class JuniorDeveloper extends Role {
         return null;
     }
 
-    /**
-     * Displays current contact information.
-     */
     private void displayContactInfo(Contact contact) {
         System.out.println();
         System.out.println(GREEN + "Current Contact Information:" + RESET);
@@ -388,11 +249,6 @@ public class JuniorDeveloper extends Role {
         System.out.println();
     }
 
-    /**
-     * Prompts user to select which field to update.
-     * 
-     * @return field name (database column), or null if cancelled
-     */
     private String selectFieldToUpdate() {
         System.out.println(CYAN + "Select field to update:" + RESET);
         System.out.println(GREEN + "[1] - First Name" + RESET);
@@ -434,12 +290,6 @@ public class JuniorDeveloper extends Role {
         };
     }
 
-    /**
-     * Gets new value for the selected field with validation guidance.
-     * 
-     * @param field the database column name
-     * @return new value, or null if cancelled
-     */
     private String getNewValueForField(String field) {
         System.out.println();
         System.out.println(CYAN + "Enter new value for " + getFieldDisplayName(field) + ":" + RESET);
@@ -466,9 +316,6 @@ public class JuniorDeveloper extends Role {
         return value;
     }
 
-    /**
-     * Returns display name for a field.
-     */
     private String getFieldDisplayName(String field) {
         return switch (field) {
             case "first_name" -> "First Name";
@@ -485,9 +332,6 @@ public class JuniorDeveloper extends Role {
         };
     }
 
-    /**
-     * Displays validation rules for a field.
-     */
     private void displayValidationRules(String field) {
         System.out.println(BLUE + "Validation rules:" + RESET);
         switch (field) {
@@ -507,9 +351,6 @@ public class JuniorDeveloper extends Role {
         System.out.println();
     }
 
-    /**
-     * Validates the new value for a field.
-     */
     private boolean validateFieldValue(String field, String value) {
         // Allow empty for optional fields
         if (value.isEmpty()) {
@@ -535,14 +376,6 @@ public class JuniorDeveloper extends Role {
         };
     }
 
-    /**
-     * Updates the contact in the database.
-     * 
-     * @param contactId the contact ID to update
-     * @param field the field to update
-     * @param newValue the new value
-     * @return true if successful, false otherwise
-     */
     private boolean updateContactInDatabase(int contactId, String field, String newValue) {
         String sql = "UPDATE contacts SET " + field + " = ?, updated_at = CURRENT_TIMESTAMP WHERE contact_id = ?";
 
@@ -567,9 +400,6 @@ public class JuniorDeveloper extends Role {
         }
     }
 
-    /**
-     * Handles unexpected errors.
-     */
     private void handleUnexpectedError(Exception e) {
         System.err.println();
         System.err.println(RED + "╔════════════════════════════════════════════════╗" + RESET);
@@ -581,9 +411,6 @@ public class JuniorDeveloper extends Role {
         pause();
     }
 
-    /**
-     * Returns string representation.
-     */
     @Override
     public String toString() {
         return "JuniorDeveloper{" +
@@ -592,4 +419,5 @@ public class JuniorDeveloper extends Role {
                 ", name='" + name + " " + surname + '\'' +
                 '}';
     }
+
 }
