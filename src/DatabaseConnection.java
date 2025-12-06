@@ -8,8 +8,8 @@ public class DatabaseConnection {
     private static final String URL =
             "jdbc:mysql://localhost:3306/cmpe";
     
-    private static final String USER = "root";
-    private static final String PASSWORD = "nilaybbb18";
+    private static final String USER = "myuser";
+    private static final String PASSWORD = "1234";
     private DatabaseConnection() {
         throw new AssertionError("DatabaseConnection is a utility class and should not be instantiated");
     }
